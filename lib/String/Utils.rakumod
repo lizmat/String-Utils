@@ -10,12 +10,14 @@ my sub between(str $string, str $before, str $after) is export {
       nqp::iseq_i((my int $left = nqp::index($string,$before)),-1),
       Nil,
       nqp::if(
-        nqp::iseq_i((my int $right = nqp::index($string,$after,$left)),-1),
+        nqp::iseq_i(
+          (my int $right = nqp::index(
+            $string,$after,(my $offset = nqp::add_i($left,nqp::chars($before)))
+          )),
+          -1
+        ),
         Nil,
-        nqp::stmts(
-          (my int $offset = $left + nqp::chars($before)),
-          nqp::substr($string,$offset,nqp::sub_i($right,$offset))
-        )
+        nqp::substr($string,$offset,nqp::sub_i($right,$offset))
       )
     )
 }
