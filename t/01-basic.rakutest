@@ -1,0 +1,18 @@
+use Test;
+use String::Utils;
+
+plan 9;
+
+is after("foobar","foo"),       "bar", 'after(foo) ok?';
+is "foobar".&after("foo"),      "bar", '.&after(foo) ok?';
+is-deeply after("foobar","goo"), Nil,  'after(goo) ok?';
+
+is before("foobar","bar"),        "foo", 'before(bar) ok?';
+is "foobar".&before("bar"),       "foo", '.&before(bar) ok?';
+is-deeply before("foobar","baz"), Nil,   'before(goo) ok?';
+
+is between("foobarbaz","foo","baz"),        "bar", 'between(foo,baz) ok?';
+is "foobarbaz".&between("foo","baz"),       "bar", '.between(foo,baz) ok?';
+is-deeply between("foobarbaz","goo","baz"), Nil,   'between(goo,baz) ok?';
+
+# vim: expandtab shiftwidth=4

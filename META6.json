@@ -1,0 +1,27 @@
+{
+  "auth": "zef:lizmat",
+  "authors": [
+    "Elizabeth Mattijsen"
+  ],
+  "build-depends": [
+  ],
+  "depends": [
+  ],
+  "description": "Provide some optimized string functions",
+  "license": "Artistic-2.0",
+  "name": "String::Utils",
+  "perl": "6.d",
+  "provides": {
+    "String::Utils": "lib/String/Utils.rakumod"
+  },
+  "resources": [
+  ],
+  "source-url": "https://github.com/lizmat/String-Utils.git",
+  "tags": [
+    "STRING",
+    "UTIL"
+  ],
+  "test-depends": [
+  ],
+  "version": "0.0.1"
+}
