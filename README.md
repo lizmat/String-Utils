@@ -15,6 +15,8 @@ say before("foobar","bar");            # foo
 
 say between("foobarbaz","foo","baz");  # bar
 
+say around("foobarbaz", "ob", "rb");   # foaz
+
 say after("foobar","foo");             # bar
 ```
 
@@ -38,6 +40,19 @@ say after("foobar","goo");   # Nil
 ```
 
 Return the string **after** a given string, or `Nil` if the given string could not be found. The equivalent of the stringification of `/ <?after foo> .* /`.
+
+around
+------
+
+```raku
+say around("foobarbaz","ob","rb");     # foaz
+
+say "foobarbaz".&around("ob","rb");    # foaz
+
+say between("foobarbaz","goo","baz");  # foobarbaz
+```
+
+Return the string **around** two given strings, or the string itself if either of the bounding strings could not be found. The equivalent of `.subst: / <?after ob> .*? <?before rb> /`.
 
 before
 ------

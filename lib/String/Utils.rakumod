@@ -22,6 +22,26 @@ my sub between(str $string, str $before, str $after) is export {
     )
 }
 
+my sub around(str $string, str $before, str $after) is export {
+    nqp::if(
+      nqp::iseq_i((my int $left = nqp::index($string,$before)),-1),
+      $string,
+      nqp::if(
+        nqp::iseq_i(
+          (my int $right = nqp::index(
+            $string,$after,nqp::add_i($left,nqp::chars($before))
+          )),
+          -1
+        ),
+        $string,
+        nqp::concat(
+          nqp::substr($string,0,$left),
+          nqp::substr($string,nqp::add_i($right,nqp::chars($after)))
+        )
+      )
+    )
+}
+
 my sub before(str $string, str $before) is export {
     nqp::iseq_i((my int $left = nqp::index($string,$before)),-1)
       ?? Nil
@@ -50,6 +70,8 @@ say before("foobar","bar");            # foo
 
 say between("foobarbaz","foo","baz");  # bar
 
+say around("foobarbaz", "ob", "rb");   # foaz
+
 say after("foobar","foo");             # bar
 
 =end code
@@ -75,6 +97,22 @@ say after("foobar","goo");   # Nil
 
 Return the string B<after> a given string, or C<Nil> if the given string could
 not be found.  The equivalent of the stringification of C</ <?after foo> .* />.
+
+=head2 around
+
+=begin code :lang<raku>
+
+say around("foobarbaz","ob","rb");     # foaz
+
+say "foobarbaz".&around("ob","rb");    # foaz
+
+say between("foobarbaz","goo","baz");  # foobarbaz
+
+=end code
+
+Return the string B<around> two given strings, or the string itself if either
+of the bounding strings could not be found.  The equivalent of
+C<.subst: / <?after ob> .*? <?before rb> />.
 
 =head2 before
 

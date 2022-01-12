@@ -1,11 +1,15 @@
 use Test;
 use String::Utils;
 
-plan 9;
+plan 12;
 
 is after("foobar","foo"),       "bar", 'after(foo) ok?';
 is "foobar".&after("foo"),      "bar", '.&after(foo) ok?';
 is-deeply after("foobar","goo"), Nil,  'after(goo) ok?';
+
+is around("foobarbaz","ob","rb"),   "foaz",      'around(foo,baz) ok?';
+is "foobarbaz".&around("ob","rb"),  "foaz",      '.around(foo,baz) ok?';
+is around("foobarbaz","goo","baz"), "foobarbaz", 'around(goo,baz) ok?';
 
 is before("foobar","bar"),        "foo", 'before(bar) ok?';
 is "foobar".&before("bar"),       "foo", '.&before(bar) ok?';

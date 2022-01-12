@@ -2,6 +2,9 @@ Revision history for String-Utils
 
 {{$NEXT}}
 
+0.0.3  2022-01-12T12:48:18+01:00
+    - Add support for "around"
+
 0.0.2  2022-01-11T12:22:09+01:00
     - Fix thinko in "between"
 
