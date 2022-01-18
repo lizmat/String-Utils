@@ -2,6 +2,9 @@ Revision history for String-Utils
 
 {{$NEXT}}
 
+0.0.4  2022-01-18T14:24:43+01:00
+    - Add support for "root"
+
 0.0.3  2022-01-12T12:48:18+01:00
     - Add support for "around"
 

@@ -1,5 +1,5 @@
 # Since this distribution is about providing optimized functionality
-# that can also be achieved by using regular expressions, it was decided
+# that can also be achieved by e.g. using regular expressions, it was decided
 # to use NQP in here.  All of these subroutines could easily be rewritten
 # in pure Raku if necessary, should that be needed for Raku implementations
 # that are not based on NQP.
@@ -54,6 +54,34 @@ my sub after(str $string, str $after) is export {
       !! nqp::substr($string,nqp::add_i($right,nqp::chars($after)))
 }
 
+my uint32 @empty;
+my sub root(*@_) is export {
+    my str $base = @_.shift.Str;
+
+    my @same := nqp::strtocodes(
+      $base,nqp::const::NORMALIZE_NFC,nqp::create(array[uint32])
+    );
+
+    nqp::while(
+      nqp::elems(@same) && @_,
+      nqp::stmts(
+        (my @next := nqp::strtocodes(
+          @_.shift.Str,nqp::const::NORMALIZE_NFC,nqp::create(array[uint32])
+        )),
+        (my int $i = -1),
+        nqp::while(
+          nqp::islt_i(($i = nqp::add_i($i,1)),nqp::elems(@same)),
+          nqp::if(
+            nqp::isne_i(nqp::atpos_i(@same,$i),nqp::atpos_i(@next,$i)),
+            nqp::splice(@same,@empty,$i,nqp::sub_i(nqp::elems(@same),$i))
+          )
+        )
+      )
+    );
+
+    nqp::substr($base, 0, nqp::elems(@same))
+}
+
 =begin pod
 
 =head1 NAME
@@ -73,6 +101,8 @@ say between("foobarbaz","foo","baz");  # bar
 say around("foobarbaz", "ob", "rb");   # foaz
 
 say after("foobar","foo");             # bar
+
+say root <abcd abce abde>;             # ab
 
 =end code
 
@@ -145,6 +175,17 @@ say between("foobarbaz","goo","baz");   # Nil
 Return the string B<between> two given strings, or C<Nil> if either of the
 bounding strings could not be found.  The equivalent of the stringification of
 C</ <?after foo> .*? <?before baz> />.
+
+=head2 root
+
+=begin code :lang<raku>
+
+say root <abcd abce abde>;  # ab
+
+=end code
+
+Return the common root of the given strings, or the empty string if no
+common string could be found.
 
 =head1 AUTHOR
 

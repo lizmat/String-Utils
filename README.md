@@ -18,6 +18,8 @@ say between("foobarbaz","foo","baz");  # bar
 say around("foobarbaz", "ob", "rb");   # foaz
 
 say after("foobar","foo");             # bar
+
+say root <abcd abce abde>;             # ab
 ```
 
 DESCRIPTION
@@ -79,6 +81,15 @@ say between("foobarbaz","goo","baz");   # Nil
 ```
 
 Return the string **between** two given strings, or `Nil` if either of the bounding strings could not be found. The equivalent of the stringification of `/ <?after foo> .*? <?before baz> /`.
+
+root
+----
+
+```raku
+say root <abcd abce abde>;  # ab
+```
+
+Return the common root of the given strings, or the empty string if no common string could be found.
 
 AUTHOR
 ======

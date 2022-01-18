@@ -1,7 +1,7 @@
 use Test;
 use String::Utils;
 
-plan 12;
+plan 15;
 
 is after("foobar","foo"),       "bar", 'after(foo) ok?';
 is "foobar".&after("foo"),      "bar", '.&after(foo) ok?';
@@ -18,5 +18,9 @@ is-deeply before("foobar","baz"), Nil,   'before(goo) ok?';
 is between("foobarbaz","foo","baz"),        "bar", 'between(foo,baz) ok?';
 is "foobarbaz".&between("foo","baz"),       "bar", '.between(foo,baz) ok?';
 is-deeply between("foobarbaz","goo","baz"), Nil,   'between(goo,baz) ok?';
+
+is (root <abcd abce abde>), "ab",   'root abcd abce abde ok?';
+is (root <abcd abcd abcd>), "abcd", 'root abcd abcd abcd ok?';
+is (root <foo bar baz>),    "",     'root foo bar baz ok?';
 
 # vim: expandtab shiftwidth=4
