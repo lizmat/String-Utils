@@ -82,6 +82,19 @@ say between("foobarbaz","goo","baz");   # Nil
 
 Return the string **between** two given strings, or `Nil` if either of the bounding strings could not be found. The equivalent of the stringification of `/ <?after foo> .*? <?before baz> /`.
 
+between-included
+----------------
+
+```raku
+say between-included("foobarbaz","oo","baz");   # oobarbaz
+
+say "foobarbaz".&between-included("oo","baz");  # oobarbaz
+
+say between-included("foobarbaz","goo","baz");  # Nil
+```
+
+Return the string **between** two given strings **including** the given strings, or `Nil` if either of the bounding strings could not be found. The equivalent of the stringification of `/ o .*? baz /`.
+
 root
 ----
 

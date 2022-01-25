@@ -22,6 +22,27 @@ my sub between(str $string, str $before, str $after) is export {
     )
 }
 
+my sub between-included(str $string, str $before, str $after) is export {
+    nqp::if(
+      nqp::iseq_i((my int $left = nqp::index($string,$before)),-1),
+      Nil,
+      nqp::if(
+        nqp::iseq_i(
+          (my int $right = nqp::index(
+            $string,$after,nqp::add_i($left,nqp::chars($before))
+          )),
+          -1
+        ),
+        Nil,
+        nqp::substr(
+          $string,
+          $left,
+          nqp::sub_i(nqp::add_i($right,nqp::chars($after)),$left)
+        )
+      )
+    )
+}
+
 my sub around(str $string, str $before, str $after) is export {
     nqp::if(
       nqp::iseq_i((my int $left = nqp::index($string,$before)),-1),
@@ -175,6 +196,22 @@ say between("foobarbaz","goo","baz");   # Nil
 Return the string B<between> two given strings, or C<Nil> if either of the
 bounding strings could not be found.  The equivalent of the stringification of
 C</ <?after foo> .*? <?before baz> />.
+
+=head2 between-included
+
+=begin code :lang<raku>
+
+say between-included("foobarbaz","oo","baz");   # oobarbaz
+
+say "foobarbaz".&between-included("oo","baz");  # oobarbaz
+
+say between-included("foobarbaz","goo","baz");  # Nil
+
+=end code
+
+Return the string B<between> two given strings B<including> the given strings,
+or C<Nil> if either of the bounding strings could not be found.  The equivalent
+of the stringification of C</ o .*? baz />.
 
 =head2 root
 

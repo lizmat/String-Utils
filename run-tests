@@ -15,7 +15,7 @@ my $done   = 0;
 sub test-dir($dir) {
     for $dir.IO.dir(:test(*.ends-with: '.t' | '.rakutest')).map(*.Str).sort {
         say "=== $_";
-        my $proc := run "raku", "--ll-exception", "-Ilib", $_, :out,:err,:merge;
+        my $proc := run "raku", "--ll-exception", "-I.", $_, :out,:err,:merge;
         if $proc {
             $proc.out.slurp;
         }

@@ -2,6 +2,9 @@ Revision history for String-Utils
 
 {{$NEXT}}
 
+0.0.5  2022-01-25T18:40:18+01:00
+    - Add support for "between-included"
+
 0.0.4  2022-01-18T14:24:43+01:00
     - Add support for "root"
 

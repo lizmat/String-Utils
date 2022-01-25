@@ -1,7 +1,7 @@
 use Test;
 use String::Utils;
 
-plan 15;
+plan 18;
 
 is after("foobar","foo"),       "bar", 'after(foo) ok?';
 is "foobar".&after("foo"),      "bar", '.&after(foo) ok?';
@@ -18,6 +18,13 @@ is-deeply before("foobar","baz"), Nil,   'before(goo) ok?';
 is between("foobarbaz","foo","baz"),        "bar", 'between(foo,baz) ok?';
 is "foobarbaz".&between("foo","baz"),       "bar", '.between(foo,baz) ok?';
 is-deeply between("foobarbaz","goo","baz"), Nil,   'between(goo,baz) ok?';
+
+is between-included("foobarbaz","oo","baz"), "oobarbaz",
+  'between-included(o,baz) ok?';
+is "foobarbaz".&between-included("oo","baz"), "oobarbaz",
+  '.between-included(o,baz) ok?';
+is-deeply between("foobarbaz","goo","baz"), Nil,
+  'between-included(goo,baz) ok?';
 
 is (root <abcd abce abde>), "ab",   'root abcd abce abde ok?';
 is (root <abcd abcd abcd>), "abcd", 'root abcd abcd abcd ok?';
