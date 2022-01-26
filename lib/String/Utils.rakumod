@@ -103,6 +103,13 @@ my sub root(*@_) is export {
     nqp::substr($base, 0, nqp::elems(@same))
 }
 
+my sub chomp-needle(str $haystack, str $needle) is export {
+    my int $offset = nqp::sub_i(nqp::chars($haystack),nqp::chars($needle));
+    nqp::eqat($haystack,$needle,$offset)
+      ?? nqp::substr($haystack,0,$offset)
+      !! $haystack
+}
+
 =begin pod
 
 =head1 NAME
@@ -119,9 +126,13 @@ say before("foobar","bar");            # foo
 
 say between("foobarbaz","foo","baz");  # bar
 
+say between-included("foobarbaz","oo","baz");  # oobarbaz
+
 say around("foobarbaz", "ob", "rb");   # foaz
 
 say after("foobar","foo");             # bar
+
+say chomp-needle("foobarbaz", "baz");  # foobar
 
 say root <abcd abce abde>;             # ab
 
@@ -157,7 +168,7 @@ say around("foobarbaz","ob","rb");     # foaz
 
 say "foobarbaz".&around("ob","rb");    # foaz
 
-say between("foobarbaz","goo","baz");  # foobarbaz
+say around("foobarbaz","goo","baz");   # foobarbaz
 
 =end code
 
@@ -212,6 +223,22 @@ say between-included("foobarbaz","goo","baz");  # Nil
 Return the string B<between> two given strings B<including> the given strings,
 or C<Nil> if either of the bounding strings could not be found.  The equivalent
 of the stringification of C</ o .*? baz />.
+
+=head2 chomp-needle
+
+=begin code :lang<raku>
+
+say chomp-needle("foobarbaz","baz");   # foobar
+
+say "foobarbaz".&chomp-needle("baz");  # foobar
+
+say chomp-needle("foobarbaz","bar");   # foobarbaz
+
+=end code
+
+Return the string B<between> two given strings B<including> the given strings,
+or C<Nil> if either of the bounding strings could not be found.  The equivalent
+of the stringification of C</ .* <?before baz $> />.
 
 =head2 root
 

@@ -2,6 +2,9 @@ Revision history for String-Utils
 
 {{$NEXT}}
 
+0.0.6  2022-01-26T12:18:55+01:00
+    - Add support for "chomp-needle"
+
 0.0.5  2022-01-25T18:40:18+01:00
     - Add support for "between-included"
 

@@ -15,9 +15,13 @@ say before("foobar","bar");            # foo
 
 say between("foobarbaz","foo","baz");  # bar
 
+say between-included("foobarbaz","oo","baz");  # oobarbaz
+
 say around("foobarbaz", "ob", "rb");   # foaz
 
 say after("foobar","foo");             # bar
+
+say chomp-needle("foobarbaz", "baz");  # foobar
 
 say root <abcd abce abde>;             # ab
 ```
@@ -51,7 +55,7 @@ say around("foobarbaz","ob","rb");     # foaz
 
 say "foobarbaz".&around("ob","rb");    # foaz
 
-say between("foobarbaz","goo","baz");  # foobarbaz
+say around("foobarbaz","goo","baz");   # foobarbaz
 ```
 
 Return the string **around** two given strings, or the string itself if either of the bounding strings could not be found. The equivalent of `.subst: / <?after ob> .*? <?before rb> /`.
@@ -94,6 +98,19 @@ say between-included("foobarbaz","goo","baz");  # Nil
 ```
 
 Return the string **between** two given strings **including** the given strings, or `Nil` if either of the bounding strings could not be found. The equivalent of the stringification of `/ o .*? baz /`.
+
+chomp-needle
+------------
+
+```raku
+say chomp-needle("foobarbaz","baz");   # foobar
+
+say "foobarbaz".&chomp-needle("baz");  # foobar
+
+say chomp-needle("foobarbaz","bar");   # foobarbaz
+```
+
+Return the string **between** two given strings **including** the given strings, or `Nil` if either of the bounding strings could not be found. The equivalent of the stringification of `/ .* <?before baz $> /`.
 
 root
 ----
