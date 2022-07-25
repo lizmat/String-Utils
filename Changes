@@ -2,6 +2,10 @@ Revision history for String-Utils
 
 {{$NEXT}}
 
+0.0.7  2022-07-25T15:14:34+02:00
+    - Fix documentation of "chomp-needle"
+    - Add sponsor link
+
 0.0.6  2022-01-26T12:18:55+01:00
     - Add support for "chomp-needle"
 

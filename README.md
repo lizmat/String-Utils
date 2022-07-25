@@ -31,6 +31,8 @@ DESCRIPTION
 
 String::Utils provides some simple string functions that are not (yet) provided by the core Raku Programming Language.
 
+These functions are implemented **without** using regexes for speed.
+
 SUBROUTINES
 ===========
 
@@ -110,7 +112,7 @@ say "foobarbaz".&chomp-needle("baz");  # foobar
 say chomp-needle("foobarbaz","bar");   # foobarbaz
 ```
 
-Return the string **between** two given strings **including** the given strings, or `Nil` if either of the bounding strings could not be found. The equivalent of the stringification of `/ .* <?before baz $> /`.
+Return the string without the given target string at the end, or the string itself if the target string is not at the end. The equivalent of `.subst(/ baz $/)`.
 
 root
 ----
@@ -127,6 +129,8 @@ AUTHOR
 Elizabeth Mattijsen <liz@raku.rocks>
 
 Source can be located at: https://github.com/lizmat/String-Utils . Comments and Pull Requests are welcome.
+
+If you like this module, or what I’m doing more generally, committing to a [small sponsorship](https://github.com/sponsors/lizmat/) would mean a great deal to me!
 
 COPYRIGHT AND LICENSE
 =====================

@@ -143,6 +143,8 @@ say root <abcd abce abde>;             # ab
 String::Utils provides some simple string functions that are not (yet)
 provided by the core Raku Programming Language.
 
+These functions are implemented B<without> using regexes for speed.
+
 =head1 SUBROUTINES
 
 =head2 after
@@ -236,9 +238,9 @@ say chomp-needle("foobarbaz","bar");   # foobarbaz
 
 =end code
 
-Return the string B<between> two given strings B<including> the given strings,
-or C<Nil> if either of the bounding strings could not be found.  The equivalent
-of the stringification of C</ .* <?before baz $> />.
+Return the string without the given target string at the end, or the string
+itself if the target string is not at the end.  The equivalent of
+C<.subst(/ baz $/)>.
 
 =head2 root
 
@@ -257,6 +259,10 @@ Elizabeth Mattijsen <liz@raku.rocks>
 
 Source can be located at: https://github.com/lizmat/String-Utils . Comments and
 Pull Requests are welcome.
+
+If you like this module, or what I’m doing more generally, committing to a
+L<small sponsorship|https://github.com/sponsors/lizmat/>  would mean a great
+deal to me!
 
 =head1 COPYRIGHT AND LICENSE
 

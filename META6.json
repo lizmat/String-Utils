@@ -19,9 +19,10 @@
   "source-url": "https://github.com/lizmat/String-Utils.git",
   "tags": [
     "STRING",
-    "UTIL"
+    "UTIL",
+    "CHOMP"
   ],
   "test-depends": [
   ],
-  "version": "0.0.6"
+  "version": "0.0.7"
 }
