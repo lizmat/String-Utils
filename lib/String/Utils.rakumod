@@ -110,6 +110,25 @@ my sub chomp-needle(str $haystack, str $needle) is export {
       !! $haystack
 }
 
+my sub is-sha1(str $needle) is export {
+    my int $i = -1;
+    if nqp::chars($needle) == 40 {
+        my $map := BEGIN {
+            my int @map;
+            @map[.ord] = 1 for "0123456789ABCDEF".comb;
+            @map;
+        }
+
+        nqp::while(
+          nqp::isle_i(++$i,40)
+            && nqp::atpos_i($map,nqp::ordat($needle,$i)),
+          nqp::null
+        )
+    }
+
+    nqp::hllbool(nqp::iseq_i($i,41))
+}
+
 =begin pod
 
 =head1 NAME
@@ -135,6 +154,8 @@ say after("foobar","foo");             # bar
 say chomp-needle("foobarbaz", "baz");  # foobar
 
 say root <abcd abce abde>;             # ab
+
+say is-sha1 "foo bar baz";             # False
 
 =end code
 
@@ -252,6 +273,18 @@ say root <abcd abce abde>;  # ab
 
 Return the common root of the given strings, or the empty string if no
 common string could be found.
+
+=head2 is-sha1
+
+=begin code :lang<raku>
+
+say is-sha1 "abcd abce abde";  # False
+say is-sha1 "356A192B7913B04C54574D18C28D46E6395428AB";  # True
+
+=end code
+
+Return a C<Bool> indicating whether the given string is a SHA1 string
+(40 chars and only containing 0123456789ABCDEF).
 
 =head1 AUTHOR
 

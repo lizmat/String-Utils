@@ -1,7 +1,7 @@
 use Test;
 use String::Utils;
 
-plan 21;
+plan 25;
 
 is after("foobar","foo"),       "bar", 'after(foo) ok?';
 is "foobar".&after("foo"),      "bar", '.&after(foo) ok?';
@@ -33,5 +33,14 @@ is chomp-needle("foobarbaz","bar"),  "foobarbaz", 'chomp-needle(bar) ok?';
 is (root <abcd abce abde>), "ab",   'root abcd abce abde ok?';
 is (root <abcd abcd abcd>), "abcd", 'root abcd abcd abcd ok?';
 is (root <foo bar baz>),    "",     'root foo bar baz ok?';
+
+is-deeply (is-sha1 "356A192B7913B04C54574D18C28D46E6395428AB"), True,
+  'is SHA1 ok';
+is-deeply (is-sha1 "356A192B7913B04C54574D18C28D46E6395428AG"), False,
+  'is SHA1 not ok (1)';
+is-deeply (is-sha1 "356A192B7913B04C54574D18C28D46E6395428A"), False,
+  'is SHA1 not ok (2)';
+is-deeply (is-sha1 "356A192B7913B04C54574D18C28D46E6395428ABC"), False,
+  'is SHA1 not ok (3)';
 
 # vim: expandtab shiftwidth=4

@@ -24,6 +24,8 @@ say after("foobar","foo");             # bar
 say chomp-needle("foobarbaz", "baz");  # foobar
 
 say root <abcd abce abde>;             # ab
+
+say is-sha1 "foo bar baz";             # False
 ```
 
 DESCRIPTION
@@ -122,6 +124,16 @@ say root <abcd abce abde>;  # ab
 ```
 
 Return the common root of the given strings, or the empty string if no common string could be found.
+
+is-sha1
+-------
+
+```raku
+say is-sha1 "abcd abce abde";  # False
+say is-sha1 "356A192B7913B04C54574D18C28D46E6395428AB";  # True
+```
+
+Return a `Bool` indicating whether the given string is a SHA1 string (40 chars and only containing 0123456789ABCDEF).
 
 AUTHOR
 ======
