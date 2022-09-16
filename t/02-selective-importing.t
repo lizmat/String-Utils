@@ -1,7 +1,7 @@
 use Test;
 
 my constant @subs = <
-  between between-included around before after root chomp-needle is-sha1
+  between between-included around before after root chomp-needle is-sha1 stem
 >;
 
 plan +@subs;
@@ -11,7 +11,7 @@ for @subs {
     $code ~= qq:!c:to/CODE/;
     {
         use String::Utils '$_';
-        ok MY::<&$_>:exists, "Did '$_' got exported?";
+        ok MY::<&$_>:exists, "Did '$_' get exported?";
     }
     CODE
 }

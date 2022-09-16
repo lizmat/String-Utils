@@ -133,6 +133,18 @@ my sub is-sha1(str $needle) {
     nqp::hllbool(nqp::iseq_i($i,41))
 }
 
+my sub stem(str $basename, $parts = *) {
+    (my @indices := indices($basename, '.'))
+      ?? nqp::substr(
+           $basename,
+           0,
+           nqp::istype($parts,Whatever) || $parts > @indices
+            ?? @indices[0]
+            !! @indices[@indices - $parts]
+         )
+      !! $basename
+}
+
 my sub EXPORT(*@names) {
     Map.new: UNIT::{@names
       ?? @names.map: { '&' ~ $_ }
@@ -169,6 +181,9 @@ say chomp-needle("foobarbaz", "baz");  # foobar
 say root <abcd abce abde>;             # ab
 
 say is-sha1 "foo bar baz";             # False
+
+say stem "foo.tar.gz";                 # foo
+say stem "foo.tar.gz", 1;              # foo.tar
 
 use String::Utils <before after>;  # only import "before" and "after"
 
@@ -304,6 +319,21 @@ say is-sha1 "356A192B7913B04C54574D18C28D46E6395428AB";  # True
 
 Return a C<Bool> indicating whether the given string is a SHA1 string
 (40 chars and only containing 0123456789ABCDEF).
+
+=head2 stem
+
+=begin code :lang<raku>
+
+say stem "foo.tar.gz";                 # foo
+say stem "foo.tar.gz", 1;              # foo.tar
+say stem "foo.tar.gz", *;              # foo
+
+=end code
+
+Return the stem of a string with all of its extensions removed.
+Optionally accepts a second argument indicating the number of extensions
+to be removed.  This may be C<*> (aka C<Whatever>) to indicate to
+remove all extensions.
 
 =head1 AUTHOR
 
