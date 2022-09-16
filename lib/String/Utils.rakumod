@@ -5,7 +5,7 @@
 # that are not based on NQP.
 use nqp;
 
-my sub between(str $string, str $before, str $after) is export {
+my sub between(str $string, str $before, str $after) {
     nqp::if(
       nqp::iseq_i((my int $left = nqp::index($string,$before)),-1),
       Nil,
@@ -22,7 +22,7 @@ my sub between(str $string, str $before, str $after) is export {
     )
 }
 
-my sub between-included(str $string, str $before, str $after) is export {
+my sub between-included(str $string, str $before, str $after) {
     nqp::if(
       nqp::iseq_i((my int $left = nqp::index($string,$before)),-1),
       Nil,
@@ -43,7 +43,7 @@ my sub between-included(str $string, str $before, str $after) is export {
     )
 }
 
-my sub around(str $string, str $before, str $after) is export {
+my sub around(str $string, str $before, str $after) {
     nqp::if(
       nqp::iseq_i((my int $left = nqp::index($string,$before)),-1),
       $string,
@@ -63,20 +63,20 @@ my sub around(str $string, str $before, str $after) is export {
     )
 }
 
-my sub before(str $string, str $before) is export {
+my sub before(str $string, str $before) {
     nqp::iseq_i((my int $left = nqp::index($string,$before)),-1)
       ?? Nil
       !! nqp::substr($string,0,$left)
 }
 
-my sub after(str $string, str $after) is export {
+my sub after(str $string, str $after) {
     nqp::iseq_i((my int $right = nqp::index($string,$after)),-1)
       ?? Nil
       !! nqp::substr($string,nqp::add_i($right,nqp::chars($after)))
 }
 
 my uint32 @empty;
-my sub root(*@_) is export {
+my sub root(*@_) {
     my str $base = @_.shift.Str;
 
     my @same := nqp::strtocodes(
@@ -103,14 +103,18 @@ my sub root(*@_) is export {
     nqp::substr($base, 0, nqp::elems(@same))
 }
 
-my sub chomp-needle(str $haystack, str $needle) is export {
+#my sub leaf(*@_) {
+#    "";
+#}
+
+my sub chomp-needle(str $haystack, str $needle) {
     my int $offset = nqp::sub_i(nqp::chars($haystack),nqp::chars($needle));
     nqp::eqat($haystack,$needle,$offset)
       ?? nqp::substr($haystack,0,$offset)
       !! $haystack
 }
 
-my sub is-sha1(str $needle) is export {
+my sub is-sha1(str $needle) {
     my int $i = -1;
     if nqp::chars($needle) == 40 {
         my $map := BEGIN {
@@ -127,6 +131,15 @@ my sub is-sha1(str $needle) is export {
     }
 
     nqp::hllbool(nqp::iseq_i($i,41))
+}
+
+my sub EXPORT(*@names) {
+    Map.new: UNIT::{@names
+      ?? @names.map: { '&' ~ $_ }
+      !! UNIT::.keys.grep({
+             .starts-with('&') && $_ ne '&EXPORT'
+         })
+    }:p
 }
 
 =begin pod
@@ -157,6 +170,8 @@ say root <abcd abce abde>;             # ab
 
 say is-sha1 "foo bar baz";             # False
 
+use String::Utils <before after>;  # only import "before" and "after"
+
 =end code
 
 =head1 DESCRIPTION
@@ -165,6 +180,10 @@ String::Utils provides some simple string functions that are not (yet)
 provided by the core Raku Programming Language.
 
 These functions are implemented B<without> using regexes for speed.
+
+By default all utility functions are exported.  But you can limit this to
+the functions you actually need by specifying the names in the C<use>
+statement.
 
 =head1 SUBROUTINES
 

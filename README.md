@@ -26,6 +26,8 @@ say chomp-needle("foobarbaz", "baz");  # foobar
 say root <abcd abce abde>;             # ab
 
 say is-sha1 "foo bar baz";             # False
+
+use String::Utils <before after>;  # only import "before" and "after"
 ```
 
 DESCRIPTION
@@ -34,6 +36,8 @@ DESCRIPTION
 String::Utils provides some simple string functions that are not (yet) provided by the core Raku Programming Language.
 
 These functions are implemented **without** using regexes for speed.
+
+By default all utility functions are exported. But you can limit this to the functions you actually need by specifying the names in the `use` statement.
 
 SUBROUTINES
 ===========
