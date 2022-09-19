@@ -25,6 +25,8 @@ say chomp-needle("foobarbaz", "baz");  # foobar
 
 say root <abcd abce abde>;             # ab
 
+say leaf <zip.txt zop.txt ff.txt>;     # .txt
+
 say is-sha1 "foo bar baz";             # False
 
 say stem "foo.tar.gz";                 # foo
@@ -130,7 +132,16 @@ root
 say root <abcd abce abde>;  # ab
 ```
 
-Return the common root of the given strings, or the empty string if no common string could be found.
+Return the common **beginning** of the given strings, or the empty string if no common string could be found. See also `leaf`.
+
+leaf
+----
+
+```raku
+say leaf <zip.txt zop.txt ff.txt>;  # .txt
+```
+
+Return the common **end** of the given strings, or the empty string if no common string could be found. See also `root`.
 
 is-sha1
 -------
@@ -146,9 +157,9 @@ stem
 ----
 
 ```raku
-say stem "foo.tar.gz";                 # foo
-say stem "foo.tar.gz", 1;              # foo.tar
-say stem "foo.tar.gz", *;              # foo
+say stem "foo.tar.gz";     # foo
+say stem "foo.tar.gz", 1;  # foo.tar
+say stem "foo.tar.gz", *;  # foo
 ```
 
 Return the stem of a string with all of its extensions removed. Optionally accepts a second argument indicating the number of extensions to be removed. This may be `*` (aka `Whatever`) to indicate to remove all extensions.

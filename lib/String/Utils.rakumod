@@ -75,37 +75,69 @@ my sub after(str $string, str $after) {
       !! nqp::substr($string,nqp::add_i($right,nqp::chars($after)))
 }
 
-my uint32 @empty;
-my sub root(*@_) {
-    my str $base = @_.shift.Str;
+my sub root(*@s) {
+    if @s > 1 {
+        my str $base = @s.shift.Str;
+        my $same := nqp::clone(nqp::strtocodes(  # MUST be a clone
+          $base,nqp::const::NORMALIZE_NFC,nqp::create(array[uint32])
+        ));
+        my int $elems = nqp::elems($same);
+        my $next := nqp::create(array[uint32]);
 
-    my @same := nqp::strtocodes(
-      $base,nqp::const::NORMALIZE_NFC,nqp::create(array[uint32])
-    );
-
-    nqp::while(
-      nqp::elems(@same) && @_,
-      nqp::stmts(
-        (my @next := nqp::strtocodes(
-          @_.shift.Str,nqp::const::NORMALIZE_NFC,nqp::create(array[uint32])
-        )),
-        (my int $i = -1),
         nqp::while(
-          nqp::islt_i(($i = nqp::add_i($i,1)),nqp::elems(@same)),
-          nqp::if(
-            nqp::isne_i(nqp::atpos_i(@same,$i),nqp::atpos_i(@next,$i)),
-            nqp::splice(@same,@empty,$i,nqp::sub_i(nqp::elems(@same),$i))
+          $elems && @s,
+          nqp::stmts(
+            nqp::strtocodes(@s.shift.Str,nqp::const::NORMALIZE_NFC,$next),
+            (my int $i = -1),
+            nqp::while(
+              nqp::islt_i(++$i,$elems),
+              nqp::if(
+                nqp::isne_i(nqp::atpos_i($same,$i),nqp::atpos_i($next,$i)),
+                nqp::setelems($same, $elems = $i)
+              )
+            )
           )
-        )
-      )
-    );
+        );
 
-    nqp::substr($base, 0, nqp::elems(@same))
+        nqp::substr($base, 0, $elems)
+    }
+    else {
+        @s.head // ""
+    }
 }
 
-#my sub leaf(*@_) {
-#    "";
-#}
+my sub leaf(*@s) {
+    if @s > 1 {
+        my str $base = nqp::flip(@s.shift.Str);
+        my $same := nqp::clone(nqp::strtocodes(  # MUST be a clone
+          $base,nqp::const::NORMALIZE_NFC,nqp::create(array[uint32])
+        ));
+        my int $elems = nqp::elems($same);
+        my $next := nqp::create(array[uint32]);
+
+        nqp::while(
+          $elems && @s,
+          nqp::stmts(
+            nqp::strtocodes(
+              nqp::flip(@s.shift.Str),nqp::const::NORMALIZE_NFC,$next
+            ),
+            (my int $i = -1),
+            nqp::while(
+              nqp::islt_i(++$i,$elems),
+              nqp::if(
+                nqp::isne_i(nqp::atpos_i($same,$i),nqp::atpos_i($next,$i)),
+                nqp::setelems($same, $elems = $i)
+              )
+            )
+          )
+        );
+
+        nqp::flip(nqp::substr($base, 0, $elems))
+    }
+    else {
+        @s.head // ""
+    }
+}
 
 my sub chomp-needle(str $haystack, str $needle) {
     my int $offset = nqp::sub_i(nqp::chars($haystack),nqp::chars($needle));
@@ -179,6 +211,8 @@ say after("foobar","foo");             # bar
 say chomp-needle("foobarbaz", "baz");  # foobar
 
 say root <abcd abce abde>;             # ab
+
+say leaf <zip.txt zop.txt ff.txt>;     # .txt
 
 say is-sha1 "foo bar baz";             # False
 
@@ -305,8 +339,19 @@ say root <abcd abce abde>;  # ab
 
 =end code
 
-Return the common root of the given strings, or the empty string if no
-common string could be found.
+Return the common B<beginning> of the given strings, or the empty string if
+no common string could be found.  See also C<leaf>.
+
+=head2 leaf
+
+=begin code :lang<raku>
+
+say leaf <zip.txt zop.txt ff.txt>;  # .txt
+
+=end code
+
+Return the common B<end> of the given strings, or the empty string if no
+common string could be found.  See also C<root>.
 
 =head2 is-sha1
 
@@ -324,9 +369,9 @@ Return a C<Bool> indicating whether the given string is a SHA1 string
 
 =begin code :lang<raku>
 
-say stem "foo.tar.gz";                 # foo
-say stem "foo.tar.gz", 1;              # foo.tar
-say stem "foo.tar.gz", *;              # foo
+say stem "foo.tar.gz";     # foo
+say stem "foo.tar.gz", 1;  # foo.tar
+say stem "foo.tar.gz", *;  # foo
 
 =end code
 

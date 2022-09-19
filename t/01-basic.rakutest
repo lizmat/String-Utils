@@ -1,7 +1,7 @@
 use Test;
 use String::Utils;
 
-plan 28;
+plan 35;
 
 is after("foobar","foo"),       "bar", 'after(foo) ok?';
 is "foobar".&after("foo"),      "bar", '.&after(foo) ok?';
@@ -33,6 +33,14 @@ is chomp-needle("foobarbaz","bar"),  "foobarbaz", 'chomp-needle(bar) ok?';
 is (root <abcd abce abde>), "ab",   'root abcd abce abde ok?';
 is (root <abcd abcd abcd>), "abcd", 'root abcd abcd abcd ok?';
 is (root <foo bar baz>),    "",     'root foo bar baz ok?';
+is (root <foo>),            "foo",  'root foo ok?';
+is (root ()),               "",     'root ok?';
+
+is (leaf <a.t b.t cafe.t>), ".t",   'leaf a.t b.t cafe.t ok?';
+is (leaf <a.tt a.tt a.tt>), "a.tt", 'leaf a.tt a.tt a.tt ok?';
+is (leaf <a.t b.c d.c>),    "",     'leaf a.t b.c d.c ok?';
+is (leaf <foo>),            "foo",  'leaf foo ok?';
+is (leaf ()),               "",     'leaf ok?';
 
 is-deeply (is-sha1 "356A192B7913B04C54574D18C28D46E6395428AB"), True,
   'is SHA1 ok';
