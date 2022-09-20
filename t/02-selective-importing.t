@@ -5,7 +5,7 @@ my constant @subs = <
   root leaf chomp-needle is-sha1 stem
 >;
 
-plan +@subs;
+plan @subs + 2;
 
 my $code;
 for @subs {
@@ -16,6 +16,14 @@ for @subs {
     }
     CODE
 }
+
+$code ~= qq:!c:to/CODE/;
+{
+    use String::Utils <root:common-start>;
+    ok MY::<&common-start>:exists, "Did 'common-start' get exported?";
+    is MY::<&common-start>.name, 'root', 'Was the original name "root"?';
+}
+CODE
 
 $code.EVAL;
 

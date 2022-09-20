@@ -2,6 +2,9 @@ Revision history for String-Utils
 
 {{$NEXT}}
 
+0.0.12  2022-09-20T11:12:59+02:00
+    - Introduce renaming syntax for subs on import
+
 0.0.11  2022-09-19T20:24:37+02:00
     - Optimize "root" a bit, also handle no strings given
     - Add support for "leaf"

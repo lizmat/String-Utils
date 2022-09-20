@@ -42,7 +42,22 @@ String::Utils provides some simple string functions that are not (yet) provided 
 
 These functions are implemented **without** using regexes for speed.
 
+SELECTIVE IMPORTING
+===================
+
+```raku
+use String::Utils <before after>;  # only import "before" and "after"
+```
+
 By default all utility functions are exported. But you can limit this to the functions you actually need by specifying the names in the `use` statement.
+
+To prevent name collisions and/or import any subroutine with a more memorable name, one can use the "original-name:known-as" syntax. A semi-colon in a specified string indicates the name by which the subroutine is known in this distribution, followed by the name with which it will be known in the lexical context in which the `use` command is executed.
+
+```raku
+use String::Utils <root:common-start>;  # import "root" as "common-start"
+
+say common-start <abcd abce abde>;  # ab
+```
 
 SUBROUTINES
 ===========

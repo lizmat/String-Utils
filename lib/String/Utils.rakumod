@@ -178,12 +178,21 @@ my sub stem(str $basename, $parts = *) {
 }
 
 my sub EXPORT(*@names) {
-    Map.new: UNIT::{@names
-      ?? @names.map: { '&' ~ $_ }
-      !! UNIT::.keys.grep({
-             .starts-with('&') && $_ ne '&EXPORT'
-         })
-    }:p
+    Map.new: @names
+      ?? @names.map: {
+             if UNIT::{"&$_"}:exists {
+                 UNIT::{"&$_"}:p
+             }
+             else {
+                 my ($in,$out) = .split(':', 2);
+                 if $out && UNIT::{"&$in"} -> &code {
+                     Pair.new: "&$out", &code
+                 }
+             }
+         }
+      !! UNIT::.grep: {
+             .key.starts-with('&') && .key ne '&EXPORT'
+         }
 }
 
 =begin pod
@@ -230,9 +239,31 @@ provided by the core Raku Programming Language.
 
 These functions are implemented B<without> using regexes for speed.
 
+=head1 SELECTIVE IMPORTING
+
+=begin code :lang<raku>
+
+use String::Utils <before after>;  # only import "before" and "after"
+
+=end code
+
 By default all utility functions are exported.  But you can limit this to
 the functions you actually need by specifying the names in the C<use>
 statement.
+
+To prevent name collisions and/or import any subroutine with a more
+memorable name, one can use the "original-name:known-as" syntax.  A
+semi-colon in a specified string indicates the name by which the subroutine
+is known in this distribution, followed by the name with which it will be
+known in the lexical context in which the C<use> command is executed.
+
+=begin code :lang<raku>
+
+use String::Utils <root:common-start>;  # import "root" as "common-start"
+
+say common-start <abcd abce abde>;  # ab
+
+=end code
 
 =head1 SUBROUTINES
 
