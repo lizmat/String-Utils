@@ -2,6 +2,9 @@ Revision history for String-Utils
 
 {{$NEXT}}
 
+0.0.13  2022-10-09T20:03:43+02:00
+    - Add support for "ngram"
+
 0.0.12  2022-09-20T11:12:59+02:00
     - Introduce renaming syntax for subs on import
 

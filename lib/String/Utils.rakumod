@@ -177,6 +177,73 @@ my sub stem(str $basename, $parts = *) {
       !! $basename
 }
 
+# This is a copy of Rakudo::Iterator::NGrams from tyhe Rakudo
+# core from 2022.10 onwards.
+my class NGrams does PredictiveIterator {
+    has str $!str;
+    has Mu  $!what;
+    has int $!size;
+    has int $!step;
+    has int $!pos;
+    has int $!todo;
+    method !SET-SELF($string, $size, $limit, $step, $partial) {
+        $!str   = $string;
+        $!what := $string.WHAT;
+        $!size  = $size < 1 ?? 1 !! $size;
+        $!step  = $step < 1 ?? 1 !! $step;
+        $!pos   = -$step;
+        $!todo = (
+          nqp::chars($!str) + $!step - ($partial ?? 1 !! $!size)
+        ) div $!step;
+        $!todo  = $limit
+          unless nqp::istype($limit,Whatever) || $limit > $!todo;
+        $!todo  = $!todo + 1;
+        self
+    }
+    method new($string, $size, $limit, $step, $partial) {
+        $string
+          ?? nqp::create(self)!SET-SELF($string,$size,$limit,$step,$partial)
+          !! Rakudo::Iterator.Empty
+    }
+    method pull-one() {
+        --$!todo
+          ?? nqp::box_s(
+               nqp::substr($!str,($!pos = $!pos + $!step),$!size),
+               $!what
+             )
+          !! IterationEnd
+    }
+    method push-all(\target --> IterationEnd) {
+        my str $str   = $!str;
+        my int $todo  = $!todo;
+        my int $pos   = $!pos;
+        my int $size  = $!size;
+        my int $step  = $!step;
+        my Mu  $what := $!what;
+
+        nqp::while(
+          --$todo,
+          target.push(
+            nqp::box_s(
+              nqp::substr($str,($pos = $pos + $step),$size),
+              $what
+            )
+          )
+        );
+        $!todo = 0;
+    }
+    method count-only(--> Int:D) {
+        nqp::sub_i($!todo,nqp::isgt_i($!todo,0))
+    }
+    method sink-all(--> IterationEnd) { $!pos = nqp::chars($!str) }
+}
+
+my sub ngram(str $string, Int:D $size, $limit = *, :$partial --> Seq:D) {
+    $size <= 1 && (nqp::istype($limit,Whatever) || $limit == Inf)
+      ?? $string.comb
+      !! Seq.new: NGrams.new: $string, $size, $limit, 1, $partial
+}
+
 my sub EXPORT(*@names) {
     Map.new: @names
       ?? @names.map: {
@@ -227,6 +294,8 @@ say is-sha1 "foo bar baz";             # False
 
 say stem "foo.tar.gz";                 # foo
 say stem "foo.tar.gz", 1;              # foo.tar
+
+say ngram "foobar", 3;                 # foo oob oba bar
 
 use String::Utils <before after>;  # only import "before" and "after"
 
@@ -410,6 +479,21 @@ Return the stem of a string with all of its extensions removed.
 Optionally accepts a second argument indicating the number of extensions
 to be removed.  This may be C<*> (aka C<Whatever>) to indicate to
 remove all extensions.
+
+=head2 ngram
+
+=begin code :lang<raku>
+
+say ngram "foobar", 3;            # foo oob oba bar
+
+say ngram "foobar", 4, :partial;  # foob ooba obar bar ar r
+
+=end code
+
+Return a sequence of substrings of the given size, while only moving up
+one position at a time in the original string.  Optionally takes a
+C<:partial> flag to also produce incomplete substrings at the end of
+the sequence.
 
 =head1 AUTHOR
 

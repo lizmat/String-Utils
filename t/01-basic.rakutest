@@ -1,7 +1,7 @@
 use Test;
 use String::Utils;
 
-plan 35;
+plan 37;
 
 is after("foobar","foo"),       "bar", 'after(foo) ok?';
 is "foobar".&after("foo"),      "bar", '.&after(foo) ok?';
@@ -54,5 +54,10 @@ is-deeply (is-sha1 "356A192B7913B04C54574D18C28D46E6395428ABC"), False,
 is-deeply stem("foo.tar.gz"), 'foo', 'stem without number of extensions';
 is-deeply stem("foo.tar.gz", 1), 'foo.tar', 'stem, 1 extension removed';
 is-deeply stem("foo.tar.gz", *), 'foo', 'stem, all extensions removed';
+
+is-deeply ngram("foobar", 3), <foo oob oba bar>,
+  'did trigrams work';
+is-deeply ngram("foobar", 4, :partial), <foob ooba obar bar ar r>,
+  'did quadgrams work with partial';
 
 # vim: expandtab shiftwidth=4

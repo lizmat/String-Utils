@@ -32,6 +32,8 @@ say is-sha1 "foo bar baz";             # False
 say stem "foo.tar.gz";                 # foo
 say stem "foo.tar.gz", 1;              # foo.tar
 
+say ngram "foobar", 3;                 # foo oob oba bar
+
 use String::Utils <before after>;  # only import "before" and "after"
 ```
 
@@ -178,6 +180,17 @@ say stem "foo.tar.gz", *;  # foo
 ```
 
 Return the stem of a string with all of its extensions removed. Optionally accepts a second argument indicating the number of extensions to be removed. This may be `*` (aka `Whatever`) to indicate to remove all extensions.
+
+ngram
+-----
+
+```raku
+say ngram "foobar", 3;            # foo oob oba bar
+
+say ngram "foobar", 4, :partial;  # foob ooba obar bar ar r
+```
+
+Return a sequence of substrings of the given size, while only moving up one position at a time in the original string. Optionally takes a `:partial` flag to also produce incomplete substrings at the end of the sequence.
 
 AUTHOR
 ======
