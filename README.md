@@ -34,6 +34,9 @@ say stem "foo.tar.gz", 1;              # foo.tar
 
 say ngram "foobar", 3;                 # foo oob oba bar
 
+say non-word "foobar";                 # False
+say non-word "foo/bar";                # True
+
 use String::Utils <before after>;  # only import "before" and "after"
 ```
 
@@ -191,6 +194,17 @@ say ngram "foobar", 4, :partial;  # foob ooba obar bar ar r
 ```
 
 Return a sequence of substrings of the given size, while only moving up one position at a time in the original string. Optionally takes a `:partial` flag to also produce incomplete substrings at the end of the sequence.
+
+non-word
+--------
+
+```raku
+say non-word "foobar";   # False
+
+say non-word "foo/bar";  # True
+```
+
+Returns a `Bool` indicating whether the string contained **any** non-word characters.
 
 AUTHOR
 ======

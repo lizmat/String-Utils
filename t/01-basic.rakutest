@@ -1,7 +1,7 @@
 use Test;
 use String::Utils;
 
-plan 37;
+plan 39;
 
 is after("foobar","foo"),       "bar", 'after(foo) ok?';
 is "foobar".&after("foo"),      "bar", '.&after(foo) ok?';
@@ -59,5 +59,8 @@ is-deeply ngram("foobar", 3), <foo oob oba bar>,
   'did trigrams work';
 is-deeply ngram("foobar", 4, :partial), <foob ooba obar bar ar r>,
   'did quadgrams work with partial';
+
+is-deeply non-word("foobar"), False, 'all word characters';
+is-deeply non-word("foo/bar"), True, 'at least one non-word character';
 
 # vim: expandtab shiftwidth=4

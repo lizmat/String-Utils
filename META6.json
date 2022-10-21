@@ -24,9 +24,10 @@
     "SHA1",
     "STEM",
     "NGRAM",
-    "NAUGHTY"
+    "NAUGHTY",
+    "WORD"
   ],
   "test-depends": [
   ],
-  "version": "0.0.13"
+  "version": "0.0.14"
 }

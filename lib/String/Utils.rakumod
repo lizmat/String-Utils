@@ -244,6 +244,17 @@ my sub ngram(str $string, Int:D $size, $limit = *, :$partial --> Seq:D) {
       !! Seq.new: NGrams.new: $string, $size, $limit, 1, $partial
 }
 
+my sub non-word(str $string --> Bool:D) {
+    nqp::hllbool(
+      nqp::islt_i(
+        nqp::findnotcclass(
+          nqp::const::CCLASS_WORD,$string,0,nqp::chars($string)
+        ),
+        nqp::chars($string)
+      )
+    )
+}
+
 my sub EXPORT(*@names) {
     Map.new: @names
       ?? @names.map: {
@@ -296,6 +307,9 @@ say stem "foo.tar.gz";                 # foo
 say stem "foo.tar.gz", 1;              # foo.tar
 
 say ngram "foobar", 3;                 # foo oob oba bar
+
+say non-word "foobar";                 # False
+say non-word "foo/bar";                # True
 
 use String::Utils <before after>;  # only import "before" and "after"
 
@@ -494,6 +508,19 @@ Return a sequence of substrings of the given size, while only moving up
 one position at a time in the original string.  Optionally takes a
 C<:partial> flag to also produce incomplete substrings at the end of
 the sequence.
+
+=head2 non-word
+
+=begin code :lang<raku>
+
+say non-word "foobar";   # False
+
+say non-word "foo/bar";  # True
+
+=end code
+
+Returns a C<Bool> indicating whether the string contained B<any>
+non-word characters.
 
 =head1 AUTHOR
 
