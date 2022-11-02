@@ -1,8 +1,8 @@
 use Test;
 
 my constant @subs = <
-  between between-included around before after
-  root leaf chomp-needle is-sha1 stem
+  between between-included around before after root leaf chomp-needle
+  is-sha1 stem ngram non-word letters has-marks
 >;
 
 plan @subs + 2;

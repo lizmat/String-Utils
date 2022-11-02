@@ -2,6 +2,9 @@ Revision history for String-Utils
 
 {{$NEXT}}
 
+0.0.15  2022-11-02T21:33:19+01:00
+    - Add support for "letters" and "has-marks"
+
 0.0.14  2022-10-21T13:09:22+02:00
     - Add support for "non-word"
 

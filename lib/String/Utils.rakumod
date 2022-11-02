@@ -238,13 +238,13 @@ my class NGrams does PredictiveIterator {
     method sink-all(--> IterationEnd) { $!pos = nqp::chars($!str) }
 }
 
-my sub ngram(str $string, Int:D $size, $limit = *, :$partial --> Seq:D) {
+my sub ngram(str $string, Int:D $size, $limit = *, :$partial) {
     $size <= 1 && (nqp::istype($limit,Whatever) || $limit == Inf)
       ?? $string.comb
       !! Seq.new: NGrams.new: $string, $size, $limit, 1, $partial
 }
 
-my sub non-word(str $string --> Bool:D) {
+my sub non-word(str $string) {
     nqp::hllbool(
       nqp::islt_i(
         nqp::findnotcclass(
@@ -253,6 +253,39 @@ my sub non-word(str $string --> Bool:D) {
         nqp::chars($string)
       )
     )
+}
+
+my sub letters(str $string) {
+    my $found := nqp::list_s;
+    my int $start;
+    my int $end;
+    my int $chars = nqp::chars($string);
+    nqp::until(
+      nqp::iseq_i($start,$chars),
+      nqp::stmts(
+        ($end = nqp::findnotcclass(
+          nqp::const::CCLASS_WORD,$string,$start,$chars
+        )),
+        nqp::if(
+          nqp::isgt_i($end,$start),
+          nqp::push_s($found,nqp::substr($string,$start,$end - $start))
+        ),
+        nqp::if(
+          nqp::iseq_i($end,$chars),
+          ($start = $end),
+          ($start = nqp::findcclass(
+            nqp::const::CCLASS_WORD,$string,$end,$chars
+          ))
+        )
+      )
+    );
+    nqp::join('',$found)
+}
+
+sub has-marks(str $string) {
+    my str $letters = letters($string);
+    nqp::strtocodes($letters, nqp::const::NORMALIZE_NFD, my int32 @ords);
+    nqp::hllbool(nqp::isne_i(nqp::chars($letters),nqp::elems(@ords)))
 }
 
 my sub EXPORT(*@names) {
@@ -310,6 +343,11 @@ say ngram "foobar", 3;                 # foo oob oba bar
 
 say non-word "foobar";                 # False
 say non-word "foo/bar";                # True
+
+say letters("//foo:bar");              # foobar
+
+say has-marks("foo👩🏽‍💻bar");             # False
+say has-marks("fóöbar");               # True
 
 use String::Utils <before after>;  # only import "before" and "after"
 
@@ -521,6 +559,29 @@ say non-word "foo/bar";  # True
 
 Returns a C<Bool> indicating whether the string contained B<any>
 non-word characters.
+
+=head2 letters
+
+=begin code :lang<raku>
+
+say letters("//foo:bar");  # foobar
+
+=end code
+
+Returns all of the alphanumeric characters in the given string as a
+string.
+
+=head2 has-marks
+
+=begin code :lang<raku>
+
+say has-marks("foo👩🏽‍💻bar");             # False
+say has-marks("fóöbar");               # True
+
+=end code
+
+Returns a C<Bool> indicating whether the given string contains any
+alphanumeric characters with marks (accents).
 
 =head1 AUTHOR
 

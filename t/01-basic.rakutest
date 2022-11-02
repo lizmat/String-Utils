@@ -1,7 +1,7 @@
 use Test;
 use String::Utils;
 
-plan 39;
+plan 47;
 
 is after("foobar","foo"),       "bar", 'after(foo) ok?';
 is "foobar".&after("foo"),      "bar", '.&after(foo) ok?';
@@ -62,5 +62,15 @@ is-deeply ngram("foobar", 4, :partial), <foob ooba obar bar ar r>,
 
 is-deeply non-word("foobar"), False, 'all word characters';
 is-deeply non-word("foo/bar"), True, 'at least one non-word character';
+
+is-deeply letters("//foo:bar"), "foobar", 'did we get foobar in letters';
+is-deeply letters("//fóö:bar"), "fóöbar", 'did we get fóöbar in letters';
+is-deeply letters("//:"), "", 'did we get empty string in letters';
+is-deeply letters(""), "", 'did we keep empty string in letters';
+
+is-deeply has-marks("foo👩🏽‍💻bar"), False, 'no marks in f👩🏽‍💻oobar';
+is-deeply has-marks("fóöbar"), True, 'marks in fóöbar';
+is-deeply has-marks("óö"), True, 'marks in óö';
+is-deeply has-marks(""), False, 'no marks in empty string';
 
 # vim: expandtab shiftwidth=4

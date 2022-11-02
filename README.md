@@ -37,6 +37,11 @@ say ngram "foobar", 3;                 # foo oob oba bar
 say non-word "foobar";                 # False
 say non-word "foo/bar";                # True
 
+say letters("//foo:bar");              # foobar
+
+say has-marks("foo👩🏽‍💻bar");             # False
+say has-marks("fóöbar");               # True
+
 use String::Utils <before after>;  # only import "before" and "after"
 ```
 
@@ -205,6 +210,25 @@ say non-word "foo/bar";  # True
 ```
 
 Returns a `Bool` indicating whether the string contained **any** non-word characters.
+
+letters
+-------
+
+```raku
+say letters("//foo:bar");  # foobar
+```
+
+Returns all of the alphanumeric characters in the given string as a string.
+
+has-marks
+---------
+
+```raku
+say has-marks("foo👩🏽‍💻bar");             # False
+say has-marks("fóöbar");               # True
+```
+
+Returns a `Bool` indicating whether the given string contains any alphanumeric characters with marks (accents).
 
 AUTHOR
 ======
