@@ -1,7 +1,7 @@
 use Test;
 use String::Utils;
 
-plan 47;
+plan 53;
 
 is after("foobar","foo"),       "bar", 'after(foo) ok?';
 is "foobar".&after("foo"),      "bar", '.&after(foo) ok?';
@@ -72,5 +72,13 @@ is-deeply has-marks("foo👩🏽‍💻bar"), False, 'no marks in f👩🏽‍�
 is-deeply has-marks("fóöbar"), True, 'marks in fóöbar';
 is-deeply has-marks("óö"), True, 'marks in óö';
 is-deeply has-marks(""), False, 'no marks in empty string';
+
+is-deeply leading-whitespace("foo"), "", 'no leading whitespace';
+is-deeply leading-whitespace(" \t foo"), " \t ", 'leading whitespace';
+is-deeply leading-whitespace(" \t "), " \t ", 'all whitespace';
+
+is-deeply trailing-whitespace("bar"), "", 'no trailing whitespace';
+is-deeply trailing-whitespace("bar \t "), " \t ", 'trailing whitespace';
+is-deeply trailing-whitespace(" \t "), " \t ", 'all whitespace';
 
 # vim: expandtab shiftwidth=4

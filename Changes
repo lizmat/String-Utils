@@ -2,6 +2,9 @@ Revision history for String-Utils
 
 {{$NEXT}}
 
+0.0.16  2023-04-16T21:15:40+02:00
+    - Add support for "leading-whitespace" and "trailing-whitespace"
+
 0.0.15  2022-11-02T21:33:19+01:00
     - Add support for "letters" and "has-marks"
 

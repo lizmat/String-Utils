@@ -288,6 +288,18 @@ sub has-marks(str $string) {
     nqp::hllbool(nqp::isne_i(nqp::chars($letters),nqp::elems(@ords)))
 }
 
+sub leading-whitespace(str $string) {
+    nqp::substr($string,0,nqp::findnotcclass(
+      nqp::const::CCLASS_WHITESPACE,$string,0,nqp::chars($string)
+    ))
+}
+
+sub trailing-whitespace(str $string) {
+    nqp::substr($string,nqp::chars($string) - nqp::findnotcclass(
+      nqp::const::CCLASS_WHITESPACE,nqp::flip($string),0,nqp::chars($string)
+    ))
+}
+
 my sub EXPORT(*@names) {
     Map.new: @names
       ?? @names.map: {
@@ -348,6 +360,9 @@ say letters("//foo:bar");              # foobar
 
 say has-marks("foo👩🏽‍💻bar");             # False
 say has-marks("fóöbar");               # True
+
+dd leading-whitespace(" \t foo");      # " \t "
+dd trailing-whitespace("bar \t ");     # " \t "
 
 use String::Utils <before after>;  # only import "before" and "after"
 
@@ -582,6 +597,30 @@ say has-marks("fóöbar");               # True
 
 Returns a C<Bool> indicating whether the given string contains any
 alphanumeric characters with marks (accents).
+
+=head2 leading-whitespace
+
+=begin code :lang<raku>
+
+dd leading-whitespace("foo");      # ""
+dd leading-whitespace(" \t foo");  # " \t "
+dd leading-whitespace(" \t ");     # " \t "
+
+=end code
+
+Returns a C<Str> containing any leading whitespace of the given string.
+
+=head2 leading-whitespace
+
+=begin code :lang<raku>
+
+dd trailing-whitespace("bar");      # ""
+dd trailing-whitespace("bar \t ");  # " \t "
+dd trailing-whitespace(" \t ");     # " \t "
+
+=end code
+
+Returns a C<Str> containing any trailing whitespace of the given string.
 
 =head1 AUTHOR
 
