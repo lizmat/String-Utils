@@ -2,6 +2,9 @@ Revision history for String-Utils
 
 {{$NEXT}}
 
+0.0.18  2023-04-30T10:46:28+02:00
+    - Add support for "is-whitespace"
+
 0.0.17  2023-04-24T11:07:56+02:00
     - Update copyright year
 

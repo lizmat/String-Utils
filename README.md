@@ -44,6 +44,8 @@ say has-marks("fóöbar");               # True
 
 dd leading-whitespace(" \t foo");      # " \t "
 dd trailing-whitespace("bar \t ");     # " \t "
+say is-whitespace("\t \n");            # True
+say is-whitespace("\ta\n");            # False
 
 use String::Utils <before after>;  # only import "before" and "after"
 ```
@@ -244,8 +246,8 @@ dd leading-whitespace(" \t ");     # " \t "
 
 Returns a `Str` containing any leading whitespace of the given string.
 
-leading-whitespace
-------------------
+trailing-whitespace
+-------------------
 
 ```raku
 dd trailing-whitespace("bar");      # ""
@@ -254,6 +256,17 @@ dd trailing-whitespace(" \t ");     # " \t "
 ```
 
 Returns a `Str` containing any trailing whitespace of the given string.
+
+is-whitespace
+-------------
+
+```raku
+say is-whitespace("\t \n");  # True
+say is-whitespace("\ta\n");  # False
+say is-whitespace("");       # True
+```
+
+Returns a `Bool` indicating whether the string consists of just whitespace characters, or is empty.
 
 AUTHOR
 ======

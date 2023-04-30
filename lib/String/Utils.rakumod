@@ -300,6 +300,17 @@ sub trailing-whitespace(str $string) {
     ))
 }
 
+sub is-whitespace(str $string) {
+    nqp::hllbool(
+      nqp::iseq_i(
+        nqp::findnotcclass(
+          nqp::const::CCLASS_WHITESPACE,$string,0,nqp::chars($string)
+        ),
+        nqp::chars($string)
+      )
+    )
+}
+
 my sub EXPORT(*@names) {
     Map.new: @names
       ?? @names.map: {
@@ -363,6 +374,8 @@ say has-marks("fóöbar");               # True
 
 dd leading-whitespace(" \t foo");      # " \t "
 dd trailing-whitespace("bar \t ");     # " \t "
+say is-whitespace("\t \n");            # True
+say is-whitespace("\ta\n");            # False
 
 use String::Utils <before after>;  # only import "before" and "after"
 
@@ -610,7 +623,7 @@ dd leading-whitespace(" \t ");     # " \t "
 
 Returns a C<Str> containing any leading whitespace of the given string.
 
-=head2 leading-whitespace
+=head2 trailing-whitespace
 
 =begin code :lang<raku>
 
@@ -621,6 +634,19 @@ dd trailing-whitespace(" \t ");     # " \t "
 =end code
 
 Returns a C<Str> containing any trailing whitespace of the given string.
+
+=head2 is-whitespace
+
+=begin code :lang<raku>
+
+say is-whitespace("\t \n");  # True
+say is-whitespace("\ta\n");  # False
+say is-whitespace("");       # True
+
+=end code
+
+Returns a C<Bool> indicating whether the string consists of just
+whitespace characters, or is empty.
 
 =head1 AUTHOR
 
