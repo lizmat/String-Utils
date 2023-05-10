@@ -2,6 +2,9 @@ Revision history for String-Utils
 
 {{$NEXT}}
 
+0.0.19  2023-05-10T17:56:41+02:00
+    - Add support for "consists-of"
+
 0.0.18  2023-04-30T10:46:28+02:00
     - Add support for "is-whitespace"
 

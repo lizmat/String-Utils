@@ -1,7 +1,7 @@
 use Test;
 use String::Utils;
 
-plan 56;
+plan 59;
 
 is after("foobar","foo"),       "bar", 'after(foo) ok?';
 is "foobar".&after("foo"),      "bar", '.&after(foo) ok?';
@@ -84,5 +84,9 @@ is-deeply trailing-whitespace(" \t "), " \t ", 'all whitespace';
 is-deeply is-whitespace("\t \n"), True,  'whitespace only';
 is-deeply is-whitespace("\ta\n"), False, 'non-whitespace';
 is-deeply is-whitespace(""),      True,  'empty';
+
+is-deeply consists-of("aaabbcc", "abc"), True, 'consists-of ok';
+is-deeply consists-of("aaadbcc", "abc"), False, 'consists-of NOT ok';
+is-deeply consists-of("", "abc"), False, 'consists-of empty NOT ok'
 
 # vim: expandtab shiftwidth=4

@@ -46,6 +46,11 @@ dd leading-whitespace(" \t foo");      # " \t "
 dd trailing-whitespace("bar \t ");     # " \t "
 say is-whitespace("\t \n");            # True
 say is-whitespace("\ta\n");            # False
+say is-whitespace("");                 # True
+
+say consists-of("aaabbcc", "abc");     # True
+say consists-of("aaadbcc", "abc");     # False
+say consists-of("", "abc");            # False
 
 use String::Utils <before after>;  # only import "before" and "after"
 ```
@@ -267,6 +272,17 @@ say is-whitespace("");       # True
 ```
 
 Returns a `Bool` indicating whether the string consists of just whitespace characters, or is empty.
+
+consists-of
+-----------
+
+```raku
+say consists-of("aaabbcc", "abc");     # True
+say consists-of("aaadbcc", "abc");     # False
+say consists-of("", "abc");            # False
+```
+
+Returns a `Bool` indicating whether the string given as the first positional argument only consists of characters given as the second positional argument.
 
 AUTHOR
 ======

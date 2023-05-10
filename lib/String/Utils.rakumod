@@ -282,25 +282,25 @@ my sub letters(str $string) {
     nqp::join('',$found)
 }
 
-sub has-marks(str $string) {
+my sub has-marks(str $string) {
     my str $letters = letters($string);
     nqp::strtocodes($letters, nqp::const::NORMALIZE_NFD, my int32 @ords);
     nqp::hllbool(nqp::isne_i(nqp::chars($letters),nqp::elems(@ords)))
 }
 
-sub leading-whitespace(str $string) {
+my sub leading-whitespace(str $string) {
     nqp::substr($string,0,nqp::findnotcclass(
       nqp::const::CCLASS_WHITESPACE,$string,0,nqp::chars($string)
     ))
 }
 
-sub trailing-whitespace(str $string) {
+my sub trailing-whitespace(str $string) {
     nqp::substr($string,nqp::chars($string) - nqp::findnotcclass(
       nqp::const::CCLASS_WHITESPACE,nqp::flip($string),0,nqp::chars($string)
     ))
 }
 
-sub is-whitespace(str $string) {
+my sub is-whitespace(str $string) {
     nqp::hllbool(
       nqp::iseq_i(
         nqp::findnotcclass(
@@ -309,6 +309,24 @@ sub is-whitespace(str $string) {
         nqp::chars($string)
       )
     )
+}
+
+my sub consists-of(str $string, str $chars) {
+    my int32 @codes;
+    my int8  @ok;
+
+    nqp::strtocodes($string,nqp::const::NORMALIZE_NFC,@codes);
+    @ok[.ord] = 1 for $chars.comb;
+
+    my int $i     = -1;
+    my int $elems = nqp::elems(@codes);
+    nqp::while(
+      nqp::islt_i(++$i,$elems)
+        && nqp::atpos_i(@ok,nqp::atpos_i(@codes,$i)),
+      nqp::null
+    );
+
+    nqp::hllbool($elems && nqp::iseq_i($i,$elems))
 }
 
 my sub EXPORT(*@names) {
@@ -376,6 +394,11 @@ dd leading-whitespace(" \t foo");      # " \t "
 dd trailing-whitespace("bar \t ");     # " \t "
 say is-whitespace("\t \n");            # True
 say is-whitespace("\ta\n");            # False
+say is-whitespace("");                 # True
+
+say consists-of("aaabbcc", "abc");     # True
+say consists-of("aaadbcc", "abc");     # False
+say consists-of("", "abc");            # False
 
 use String::Utils <before after>;  # only import "before" and "after"
 
@@ -647,6 +670,20 @@ say is-whitespace("");       # True
 
 Returns a C<Bool> indicating whether the string consists of just
 whitespace characters, or is empty.
+
+=head2 consists-of
+
+=begin code :lang<raku>
+
+say consists-of("aaabbcc", "abc");     # True
+say consists-of("aaadbcc", "abc");     # False
+say consists-of("", "abc");            # False
+
+=end code
+
+Returns a C<Bool> indicating whether the string given as the first
+positional argument only consists of characters given as the second
+positional argument.
 
 =head1 AUTHOR
 
