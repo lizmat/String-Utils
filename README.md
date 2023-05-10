@@ -50,7 +50,7 @@ say is-whitespace("");                 # True
 
 say consists-of("aaabbcc", "abc");     # True
 say consists-of("aaadbcc", "abc");     # False
-say consists-of("", "abc");            # False
+say consists-of("", "abc");            # True
 
 use String::Utils <before after>;  # only import "before" and "after"
 ```
@@ -279,10 +279,10 @@ consists-of
 ```raku
 say consists-of("aaabbcc", "abc");     # True
 say consists-of("aaadbcc", "abc");     # False
-say consists-of("", "abc");            # False
+say consists-of("", "abc");            # True
 ```
 
-Returns a `Bool` indicating whether the string given as the first positional argument only consists of characters given as the second positional argument.
+Returns a `Bool` indicating whether the string given as the first positional argument only consists of characters given as the second positional argument, or is empty.
 
 AUTHOR
 ======

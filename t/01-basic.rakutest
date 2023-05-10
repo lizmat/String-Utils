@@ -87,6 +87,6 @@ is-deeply is-whitespace(""),      True,  'empty';
 
 is-deeply consists-of("aaabbcc", "abc"), True, 'consists-of ok';
 is-deeply consists-of("aaadbcc", "abc"), False, 'consists-of NOT ok';
-is-deeply consists-of("", "abc"), False, 'consists-of empty NOT ok'
+is-deeply consists-of("", "abc"), True, 'consists-of empty ok'
 
 # vim: expandtab shiftwidth=4

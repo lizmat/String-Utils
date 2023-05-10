@@ -2,6 +2,10 @@ Revision history for String-Utils
 
 {{$NEXT}}
 
+0.0.20  2023-05-10T18:21:53+02:00
+    - Make "consists-of" semantics same as "is-whitespace" with
+      regards to handling the empty string
+
 0.0.19  2023-05-10T17:56:41+02:00
     - Add support for "consists-of"
 

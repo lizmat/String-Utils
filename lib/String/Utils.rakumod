@@ -326,7 +326,7 @@ my sub consists-of(str $string, str $chars) {
       nqp::null
     );
 
-    nqp::hllbool($elems && nqp::iseq_i($i,$elems))
+    nqp::hllbool(nqp::iseq_i($i,$elems))
 }
 
 my sub EXPORT(*@names) {
@@ -398,7 +398,7 @@ say is-whitespace("");                 # True
 
 say consists-of("aaabbcc", "abc");     # True
 say consists-of("aaadbcc", "abc");     # False
-say consists-of("", "abc");            # False
+say consists-of("", "abc");            # True
 
 use String::Utils <before after>;  # only import "before" and "after"
 
@@ -677,13 +677,13 @@ whitespace characters, or is empty.
 
 say consists-of("aaabbcc", "abc");     # True
 say consists-of("aaadbcc", "abc");     # False
-say consists-of("", "abc");            # False
+say consists-of("", "abc");            # True
 
 =end code
 
 Returns a C<Bool> indicating whether the string given as the first
 positional argument only consists of characters given as the second
-positional argument.
+positional argument, or is empty.
 
 =head1 AUTHOR
 
