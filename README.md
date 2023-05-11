@@ -52,6 +52,10 @@ say consists-of("aaabbcc", "abc");     # True
 say consists-of("aaadbcc", "abc");     # False
 say consists-of("", "abc");            # True
 
+say all-same("aaaaaa");                # "a"
+say all-same("aaaaba");                # Nil
+say all-same("");                      # Nil
+
 use String::Utils <before after>;  # only import "before" and "after"
 ```
 
@@ -283,6 +287,17 @@ say consists-of("", "abc");            # True
 ```
 
 Returns a `Bool` indicating whether the string given as the first positional argument only consists of characters given as the second positional argument, or is empty.
+
+all-same
+--------
+
+```raku
+say all-same("aaaaaa");                # "a"
+say all-same("aaaaba");                # Nil
+say all-same("");                      # Nil
+```
+
+If the given string consists of a single character, returns that character. Else returns `Nil`.
 
 AUTHOR
 ======

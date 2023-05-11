@@ -1,7 +1,7 @@
 use Test;
 use String::Utils;
 
-plan 59;
+plan 62;
 
 is after("foobar","foo"),       "bar", 'after(foo) ok?';
 is "foobar".&after("foo"),      "bar", '.&after(foo) ok?';
@@ -87,6 +87,11 @@ is-deeply is-whitespace(""),      True,  'empty';
 
 is-deeply consists-of("aaabbcc", "abc"), True, 'consists-of ok';
 is-deeply consists-of("aaadbcc", "abc"), False, 'consists-of NOT ok';
-is-deeply consists-of("", "abc"), True, 'consists-of empty ok'
+is-deeply consists-of("", "abc"), True, 'consists-of empty ok';
+
+is-deeply all-same("aaaaaa"), "a", 'all-same ok';
+is-deeply all-same("aaaaba"), Nil, 'all-same NOT ok';
+is-deeply all-same(""), Nil, 'all-same empty NOT ok';
+
 
 # vim: expandtab shiftwidth=4
