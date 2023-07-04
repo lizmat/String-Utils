@@ -1,7 +1,7 @@
 use Test;
 use String::Utils;
 
-plan 62;
+plan 68;
 
 is after("foobar","foo"),       "bar", 'after(foo) ok?';
 is "foobar".&after("foo"),      "bar", '.&after(foo) ok?';
@@ -83,7 +83,15 @@ is-deeply trailing-whitespace(" \t "), " \t ", 'all whitespace';
 
 is-deeply is-whitespace("\t \n"), True,  'whitespace only';
 is-deeply is-whitespace("\ta\n"), False, 'non-whitespace';
-is-deeply is-whitespace(""),      True,  'empty';
+is-deeply is-whitespace(""),      True,  'whitespace empty';
+
+is-deeply is-uppercase("FOOBAR"), True,  'uppercase only';
+is-deeply is-uppercase("FooBar"), False, 'non-uppercase';
+is-deeply is-uppercase(""),       True,  'uppercase empty';
+
+is-deeply is-lowercase("foobar"), True,  'lowercase only';
+is-deeply is-lowercase("FooBar"), False, 'non-lowercase';
+is-deeply is-lowercase(""),       True,  'lowercase empty';
 
 is-deeply consists-of("aaabbcc", "abc"), True, 'consists-of ok';
 is-deeply consists-of("aaadbcc", "abc"), False, 'consists-of NOT ok';

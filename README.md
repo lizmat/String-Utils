@@ -48,6 +48,14 @@ say is-whitespace("\t \n");            # True
 say is-whitespace("\ta\n");            # False
 say is-whitespace("");                 # True
 
+say is-uppercase("FOOBAR");            # True
+say is-uppercase("FooBar");            # False
+say is-uppercase("");                  # True
+
+say is-lowercase("foobar");            # True
+say is-lowercase("FooBar");            # False
+say is-lowercase("");                  # True
+
 say consists-of("aaabbcc", "abc");     # True
 say consists-of("aaadbcc", "abc");     # False
 say consists-of("", "abc");            # True
@@ -276,6 +284,28 @@ say is-whitespace("");       # True
 ```
 
 Returns a `Bool` indicating whether the string consists of just whitespace characters, or is empty.
+
+is-uppercase
+------------
+
+```raku
+say is-uppercase("FOOBAR");  # True
+say is-uppercase("FooBar");  # False
+say is-uppercase("");        # True
+```
+
+Returns a `Bool` indicating whether the string consists of just uppercase characters, or is empty.
+
+is-lowercase
+------------
+
+```raku
+say is-lowercase("foobar");  # True
+say is-lowercase("FooBar");  # False
+say is-lowercase("");        # True
+```
+
+Returns a `Bool` indicating whether the string consists of just lowercase characters, or is empty.
 
 consists-of
 -----------

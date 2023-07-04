@@ -2,6 +2,10 @@ Revision history for String-Utils
 
 {{$NEXT}}
 
+0.0.22  2023-07-04T21:31:56+02:00
+    - Add support for "is-uppercase"
+    - Add support for "is-lowercase"
+
 0.0.21  2023-05-11T11:32:44+02:00
     - Add support for "all-same"
 

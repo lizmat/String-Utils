@@ -300,15 +300,25 @@ my sub trailing-whitespace(str $string) {
     ))
 }
 
-my sub is-whitespace(str $string) {
+my sub is-CCLASS(str $string, int $type) {
     nqp::hllbool(
       nqp::iseq_i(
-        nqp::findnotcclass(
-          nqp::const::CCLASS_WHITESPACE,$string,0,nqp::chars($string)
-        ),
+        nqp::findnotcclass($type,$string,0,nqp::chars($string)),
         nqp::chars($string)
       )
     )
+}
+
+my sub is-whitespace(str $string) {
+    is-CCLASS($string, nqp::const::CCLASS_WHITESPACE)
+}
+
+my sub is-uppercase(str $string) {
+    is-CCLASS($string, nqp::const::CCLASS_UPPERCASE)
+}
+
+my sub is-lowercase(str $string) {
+    is-CCLASS($string, nqp::const::CCLASS_LOWERCASE)
 }
 
 my sub consists-of(str $string, str $chars) {
@@ -350,7 +360,7 @@ my sub EXPORT(*@names) {
              }
          }
       !! UNIT::.grep: {
-             .key.starts-with('&') && .key ne '&EXPORT'
+             .key.starts-with('&') && !(.key eq '&EXPORT' | '&is-CCLASS')
          }
 }
 
@@ -402,6 +412,14 @@ dd trailing-whitespace("bar \t ");     # " \t "
 say is-whitespace("\t \n");            # True
 say is-whitespace("\ta\n");            # False
 say is-whitespace("");                 # True
+
+say is-uppercase("FOOBAR");            # True
+say is-uppercase("FooBar");            # False
+say is-uppercase("");                  # True
+
+say is-lowercase("foobar");            # True
+say is-lowercase("FooBar");            # False
+say is-lowercase("");                  # True
 
 say consists-of("aaabbcc", "abc");     # True
 say consists-of("aaadbcc", "abc");     # False
@@ -681,6 +699,32 @@ say is-whitespace("");       # True
 
 Returns a C<Bool> indicating whether the string consists of just
 whitespace characters, or is empty.
+
+=head2 is-uppercase
+
+=begin code :lang<raku>
+
+say is-uppercase("FOOBAR");  # True
+say is-uppercase("FooBar");  # False
+say is-uppercase("");        # True
+
+=end code
+
+Returns a C<Bool> indicating whether the string consists of just
+uppercase characters, or is empty.
+
+=head2 is-lowercase
+
+=begin code :lang<raku>
+
+say is-lowercase("foobar");  # True
+say is-lowercase("FooBar");  # False
+say is-lowercase("");        # True
+
+=end code
+
+Returns a C<Bool> indicating whether the string consists of just
+lowercase characters, or is empty.
 
 =head2 consists-of
 
