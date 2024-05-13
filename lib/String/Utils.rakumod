@@ -453,6 +453,8 @@ say non-word "foo/bar";                # True
 
 say letters("//foo:bar");              # foobar
 
+say nomark("élève");                   # eleve
+
 say has-marks("foo👩🏽‍💻bar");             # False
 say has-marks("fóöbar");               # True
 
