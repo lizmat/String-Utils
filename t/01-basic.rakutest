@@ -1,7 +1,7 @@
 use Test;
 use String::Utils;
 
-plan 68;
+plan 71;
 
 is after("foobar","foo"),       "bar", 'after(foo) ok?';
 is "foobar".&after("foo"),      "bar", '.&after(foo) ok?';
@@ -101,5 +101,8 @@ is-deeply all-same("aaaaaa"), "a", 'all-same ok';
 is-deeply all-same("aaaaba"), Nil, 'all-same NOT ok';
 is-deeply all-same(""), Nil, 'all-same empty NOT ok';
 
+is-deeply nomark("élève"), "eleve", 'nomark with marks ok';
+is-deeply nomark("eleve"), "eleve", 'nomark without marks ok';
+is-deeply nomark(""),      "",      'nomark empty ok';
 
 # vim: expandtab shiftwidth=4

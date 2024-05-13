@@ -282,6 +282,55 @@ my sub letters(str $string) {
     nqp::join('',$found)
 }
 
+my constant $gcprop = nqp::unipropcode("General_Category");
+my constant $empty  = nqp::create(array[uint32]);
+my sub nomark(str $string) {
+
+    # At least 1 char in the string
+    if nqp::chars($string) -> int $c {
+        my $codes := nqp::strtocodes(
+          $string,
+          nqp::const::NORMALIZE_NFD,
+          nqp::create(array[uint32])
+        );
+        my int $m = nqp::elems($codes);
+
+        # No codepoints that decomposed
+        if $m == $c {
+            $string
+        }
+
+        # At least one codepoint that decomposed
+        else {
+            my $cleaned := nqp::setelems(
+              nqp::setelems(nqp::create(array[uint32]), $c),
+              0
+            );
+
+            my int $i = -1;
+            nqp::while(
+              ++$i < $m,
+              nqp::if(
+                nqp::isne_i(
+                  nqp::getuniprop_int(
+                    nqp::atpos_i($codes, $i),
+                    $gcprop
+                  ),
+                  6   # mark
+                ),
+                nqp::push_i($cleaned, nqp::atpos_i($codes, $i))
+              )
+            );
+            nqp::strfromcodes($cleaned);
+        }
+    }
+
+    # Nothing to work with
+    else {
+        $string
+    }
+}
+
 my sub has-marks(str $string) {
     my str $letters = letters($string);
     nqp::strtocodes($letters, nqp::const::NORMALIZE_NFD, my int32 @ords);
@@ -651,6 +700,16 @@ say letters("//foo:bar");  # foobar
 Returns all of the alphanumeric characters in the given string as a
 string.
 
+=head2 nomark
+
+=begin code :lang<raku>
+
+say nomark("élève");  # eleve
+
+=end code
+
+Returns the given string with any diacritcs removed.
+
 =head2 has-marks
 
 =begin code :lang<raku>
@@ -766,7 +825,7 @@ deal to me!
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2022, 2023 Elizabeth Mattijsen
+Copyright 2022, 2023, 2024 Elizabeth Mattijsen
 
 This library is free software; you can redistribute it and/or modify it under the Artistic License 2.0.
 

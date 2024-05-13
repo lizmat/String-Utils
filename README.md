@@ -242,6 +242,15 @@ say letters("//foo:bar");  # foobar
 
 Returns all of the alphanumeric characters in the given string as a string.
 
+nomark
+------
+
+```raku
+say nomark("élève");  # eleve
+```
+
+Returns the given string with any diacritcs removed.
+
 has-marks
 ---------
 
@@ -341,7 +350,7 @@ If you like this module, or what I’m doing more generally, committing to a [sm
 COPYRIGHT AND LICENSE
 =====================
 
-Copyright 2022, 2023 Elizabeth Mattijsen
+Copyright 2022, 2023, 2024 Elizabeth Mattijsen
 
 This library is free software; you can redistribute it and/or modify it under the Artistic License 2.0.
 

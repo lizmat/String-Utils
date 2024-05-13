@@ -25,9 +25,10 @@
     "STEM",
     "NGRAM",
     "NAUGHTY",
-    "WORD"
+    "WORD",
+    "MARKS"
   ],
   "test-depends": [
   ],
-  "version": "0.0.22"
+  "version": "0.0.23"
 }
