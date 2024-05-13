@@ -147,7 +147,7 @@ my sub chomp-needle(str $haystack, str $needle) {
 }
 
 my sub is-sha1(str $needle) {
-    my int $i = -1;
+    my int $i;
     if nqp::chars($needle) == 40 {
         my $map := BEGIN {
             my int @map;
@@ -156,9 +156,9 @@ my sub is-sha1(str $needle) {
         }
 
         nqp::while(
-          nqp::isle_i(++$i,40)
+          nqp::isle_i($i,40)
             && nqp::atpos_i($map,nqp::ordat($needle,$i)),
-          nqp::null
+          ++$i
         )
     }
 
