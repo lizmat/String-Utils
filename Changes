@@ -1,6 +1,8 @@
 Revision history for String-Utils
 
 {{$NEXT}}
+    - Add separate CI badges for each OS
+    - Add sponsor button
 
 0.0.23  2024-05-13T12:59:15+02:00
     - Add support for "nomark"

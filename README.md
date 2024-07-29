@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/lizmat/String-Utils/workflows/test/badge.svg)](https://github.com/lizmat/String-Utils/actions)
+[![Actions Status](https://github.com/lizmat/String-Utils/actions/workflows/linux.yml/badge.svg)](https://github.com/lizmat/String-Utils/actions) [![Actions Status](https://github.com/lizmat/String-Utils/actions/workflows/macos.yml/badge.svg)](https://github.com/lizmat/String-Utils/actions) [![Actions Status](https://github.com/lizmat/String-Utils/actions/workflows/windows.yml/badge.svg)](https://github.com/lizmat/String-Utils/actions)
 
 NAME
 ====
@@ -38,6 +38,8 @@ say non-word "foobar";                 # False
 say non-word "foo/bar";                # True
 
 say letters("//foo:bar");              # foobar
+
+say nomark("élève");                   # eleve
 
 say has-marks("foo👩🏽‍💻bar");             # False
 say has-marks("fóöbar");               # True
