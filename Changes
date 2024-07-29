@@ -1,6 +1,8 @@
 Revision history for String-Utils
 
 {{$NEXT}}
+
+0.0.24  2024-07-29T15:44:22+02:00
     - Add separate CI badges for each OS
     - Add sponsor button
 
