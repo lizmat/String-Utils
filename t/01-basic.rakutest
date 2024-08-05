@@ -1,7 +1,7 @@
 use Test;
 use String::Utils;
 
-plan 71;
+plan 74;
 
 is after("foobar","foo"),       "bar", 'after(foo) ok?';
 is "foobar".&after("foo"),      "bar", '.&after(foo) ok?';
@@ -104,5 +104,15 @@ is-deeply all-same(""), Nil, 'all-same empty NOT ok';
 is-deeply nomark("élève"), "eleve", 'nomark with marks ok';
 is-deeply nomark("eleve"), "eleve", 'nomark without marks ok';
 is-deeply nomark(""),      "",      'nomark empty ok';
+
+is-deeply paragraphs("a\n\nb\n\n\nc"),
+  (0 => "a", 2 => "b", 5 => "c"),
+  'paragraphs from string ok';
+
+is-deeply paragraphs("\na\n\nb\n\n\nc", 1),
+  (2 => "a", 4 => "b", 7 => "c"),
+  'paragraphs from string ok with initial line number set';
+
+is paragraphs($*PROGRAM.lines).elems, 28, 'reading from file lazily';
 
 # vim: expandtab shiftwidth=4

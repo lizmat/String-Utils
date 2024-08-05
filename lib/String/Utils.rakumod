@@ -395,6 +395,73 @@ my sub all-same(str $string) {
       !! Nil
 }
 
+my proto sub paragraphs(|) {*}
+my multi sub paragraphs(@source, Int:D $initial = 0) {
+    my class Paragraphs does Iterator {
+        has     $!iterator;
+        has int $!line;
+
+        method new($iterator, int $line) {
+            my $self := nqp::create(self);
+            nqp::bindattr(  $self,Paragraphs,'$!iterator',$iterator);
+            nqp::bindattr_i($self,Paragraphs,'$!line',    $line - 1);
+            $self
+        }
+
+        method pull-one() {
+
+            # Last iteration produced a paragraph, finish now
+            return IterationEnd if nqp::isnull($!iterator);
+
+            # Production logic
+            my int $line   = $!line;
+            my $collected := nqp::list_s;
+            my sub paragraph() {
+               $!line = $line;
+
+               Pair.new(
+                  $line - nqp::elems($collected),
+                  nqp::join("\n", $collected)
+               )
+            }
+
+            # Collection logic
+            nqp::until(
+              nqp::eqaddr(($_ := $!iterator.pull-one),IterationEnd),
+              nqp::stmts(
+                ++$line,
+                nqp::if(
+                  is-whitespace($_),
+                  nqp::if(
+                    nqp::elems($collected),
+                    (return paragraph)
+                  ),
+                  nqp::push_s($collected, $_)
+                )
+              )
+            );
+
+            # Still need to produce final paragraph
+            if nqp::elems($collected) {
+                $!iterator := nqp::null;
+                ++$line;
+                paragraph
+            }
+
+            # No final paragraph, we're done
+            else {
+                IterationEnd
+            }
+        }
+    }
+
+    # Produce the sequence
+    Seq.new: Paragraphs.new(@source.iterator, $initial)
+}
+my multi sub paragraphs(Cool:D $string, Int:D $initial = 0) {
+    paragraphs $string.Str.lines, $initial
+}
+
 my sub EXPORT(*@names) {
     Map.new: @names
       ?? @names.map: {

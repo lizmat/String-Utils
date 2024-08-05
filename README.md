@@ -66,6 +66,9 @@ say all-same("aaaaaa");                # "a"
 say all-same("aaaaba");                # Nil
 say all-same("");                      # Nil
 
+.say for paragraphs("a\n\nb");         # 0 => a␤2 => b␤
+.say for paragraphs($path.IO.lines);   # …
+
 use String::Utils <before after>;  # only import "before" and "after"
 ```
 
@@ -339,6 +342,19 @@ say all-same("");                      # Nil
 ```
 
 If the given string consists of a single character, returns that character. Else returns `Nil`.
+
+paragraphs
+----------
+
+```raku
+.say for paragraphs($path.IO.lines);   # …
+.say for paragraphs("a\n\nb");         # 0 => a␤2 => b␤
+.say for paragraphs("a\n\nb", 1);      # 1 => a␤3 => b␤
+```
+
+Lazily produces a `Seq` of `Pairs` with paragraphs from a `Seq` or string in which the key is the line number where the paragraph starts, and the value is the paragraph (without trailing newline).
+
+The optional second argument can be used to indicate the ordinal number of the first line in the string.
 
 AUTHOR
 ======
