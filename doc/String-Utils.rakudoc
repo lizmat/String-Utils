@@ -1,0 +1,421 @@
+=begin pod
+
+=head1 NAME
+
+String::Utils - Provide some optimized string functions
+
+=head1 SYNOPSIS
+
+=begin code :lang<raku>
+
+use String::Utils;
+
+say before("foobar","bar");            # foo
+
+say between("foobarbaz","foo","baz");  # bar
+
+say between-included("foobarbaz","oo","baz");  # oobarbaz
+
+say around("foobarbaz", "ob", "rb");   # foaz
+
+say after("foobar","foo");             # bar
+
+say chomp-needle("foobarbaz", "baz");  # foobar
+
+say root <abcd abce abde>;             # ab
+
+say leaf <zip.txt zop.txt ff.txt>;     # .txt
+
+say is-sha1 "foo bar baz";             # False
+
+say stem "foo.tar.gz";                 # foo
+say stem "foo.tar.gz", 1;              # foo.tar
+
+say ngram "foobar", 3;                 # foo oob oba bar
+
+say non-word "foobar";                 # False
+say non-word "foo/bar";                # True
+
+say letters("//foo:bar");              # foobar
+
+say nomark("élève");                   # eleve
+
+say has-marks("foo👩🏽‍💻bar");             # False
+say has-marks("fóöbar");               # True
+
+dd leading-whitespace(" \t foo");      # " \t "
+dd trailing-whitespace("bar \t ");     # " \t "
+say is-whitespace("\t \n");            # True
+say is-whitespace("\ta\n");            # False
+say is-whitespace("");                 # True
+
+say is-uppercase("FOOBAR");            # True
+say is-uppercase("FooBar");            # False
+say is-uppercase("");                  # True
+
+say is-lowercase("foobar");            # True
+say is-lowercase("FooBar");            # False
+say is-lowercase("");                  # True
+
+say consists-of("aaabbcc", "abc");     # True
+say consists-of("aaadbcc", "abc");     # False
+say consists-of("", "abc");            # True
+
+say all-same("aaaaaa");                # "a"
+say all-same("aaaaba");                # Nil
+say all-same("");                      # Nil
+
+use String::Utils <before after>;  # only import "before" and "after"
+
+=end code
+
+=head1 DESCRIPTION
+
+String::Utils provides some simple string functions that are not (yet)
+provided by the core Raku Programming Language.
+
+These functions are implemented B<without> using regexes for speed.
+
+=head1 SELECTIVE IMPORTING
+
+=begin code :lang<raku>
+
+use String::Utils <before after>;  # only import "before" and "after"
+
+=end code
+
+By default all utility functions are exported.  But you can limit this to
+the functions you actually need by specifying the names in the C<use>
+statement.
+
+To prevent name collisions and/or import any subroutine with a more
+memorable name, one can use the "original-name:known-as" syntax.  A
+semi-colon in a specified string indicates the name by which the subroutine
+is known in this distribution, followed by the name with which it will be
+known in the lexical context in which the C<use> command is executed.
+
+=begin code :lang<raku>
+
+use String::Utils <root:common-start>;  # import "root" as "common-start"
+
+say common-start <abcd abce abde>;  # ab
+
+=end code
+
+=head1 SUBROUTINES
+
+=head2 after
+
+=begin code :lang<raku>
+
+say after("foobar","foo");   # bar
+
+say "foobar".&after("foo");  # bar
+
+say after("foobar","goo");   # Nil
+
+=end code
+
+Return the string B<after> a given string, or C<Nil> if the given string could
+not be found.  The equivalent of the stringification of C</ <?after foo> .* />.
+
+=head2 around
+
+=begin code :lang<raku>
+
+say around("foobarbaz","ob","rb");     # foaz
+
+say "foobarbaz".&around("ob","rb");    # foaz
+
+say around("foobarbaz","goo","baz");   # foobarbaz
+
+=end code
+
+Return the string B<around> two given strings, or the string itself if either
+of the bounding strings could not be found.  The equivalent of
+C<.subst: / <?after ob> .*? <?before rb> />.
+
+=head2 before
+
+=begin code :lang<raku>
+
+say before("foobar","bar");   # foo
+
+say "foobar".&before("bar");  # foo
+
+say before("foobar","baz");   # Nil
+
+=end code
+
+Return the string B<before> a given string, or C<Nil> if the given string could
+not be found.  The equivalent of the stringification of
+C</ .*? <?before bar> />.
+
+=head2 between
+
+=begin code :lang<raku>
+
+say between("foobarbaz","foo","baz");   # bar
+
+say "foobarbaz".&between("foo","baz");  # bar
+
+say between("foobarbaz","goo","baz");   # Nil
+
+=end code
+
+Return the string B<between> two given strings, or C<Nil> if either of the
+bounding strings could not be found.  The equivalent of the stringification of
+C</ <?after foo> .*? <?before baz> />.
+
+=head2 between-included
+
+=begin code :lang<raku>
+
+say between-included("foobarbaz","oo","baz");   # oobarbaz
+
+say "foobarbaz".&between-included("oo","baz");  # oobarbaz
+
+say between-included("foobarbaz","goo","baz");  # Nil
+
+=end code
+
+Return the string B<between> two given strings B<including> the given strings,
+or C<Nil> if either of the bounding strings could not be found.  The equivalent
+of the stringification of C</ o .*? baz />.
+
+=head2 chomp-needle
+
+=begin code :lang<raku>
+
+say chomp-needle("foobarbaz","baz");   # foobar
+
+say "foobarbaz".&chomp-needle("baz");  # foobar
+
+say chomp-needle("foobarbaz","bar");   # foobarbaz
+
+=end code
+
+Return the string without the given target string at the end, or the string
+itself if the target string is not at the end.  The equivalent of
+C<.subst(/ baz $/)>.
+
+=head2 root
+
+=begin code :lang<raku>
+
+say root <abcd abce abde>;  # ab
+
+=end code
+
+Return the common B<beginning> of the given strings, or the empty string if
+no common string could be found.  See also C<leaf>.
+
+=head2 leaf
+
+=begin code :lang<raku>
+
+say leaf <zip.txt zop.txt ff.txt>;  # .txt
+
+=end code
+
+Return the common B<end> of the given strings, or the empty string if no
+common string could be found.  See also C<root>.
+
+=head2 is-sha1
+
+=begin code :lang<raku>
+
+say is-sha1 "abcd abce abde";  # False
+say is-sha1 "356A192B7913B04C54574D18C28D46E6395428AB";  # True
+
+=end code
+
+Return a C<Bool> indicating whether the given string is a SHA1 string
+(40 chars and only containing 0123456789ABCDEF).
+
+=head2 stem
+
+=begin code :lang<raku>
+
+say stem "foo.tar.gz";     # foo
+say stem "foo.tar.gz", 1;  # foo.tar
+say stem "foo.tar.gz", *;  # foo
+
+=end code
+
+Return the stem of a string with all of its extensions removed.
+Optionally accepts a second argument indicating the number of extensions
+to be removed.  This may be C<*> (aka C<Whatever>) to indicate to
+remove all extensions.
+
+=head2 ngram
+
+=begin code :lang<raku>
+
+say ngram "foobar", 3;            # foo oob oba bar
+
+say ngram "foobar", 4, :partial;  # foob ooba obar bar ar r
+
+=end code
+
+Return a sequence of substrings of the given size, while only moving up
+one position at a time in the original string.  Optionally takes a
+C<:partial> flag to also produce incomplete substrings at the end of
+the sequence.
+
+=head2 non-word
+
+=begin code :lang<raku>
+
+say non-word "foobar";   # False
+
+say non-word "foo/bar";  # True
+
+=end code
+
+Returns a C<Bool> indicating whether the string contained B<any>
+non-word characters.
+
+=head2 letters
+
+=begin code :lang<raku>
+
+say letters("//foo:bar");  # foobar
+
+=end code
+
+Returns all of the alphanumeric characters in the given string as a
+string.
+
+=head2 nomark
+
+=begin code :lang<raku>
+
+say nomark("élève");  # eleve
+
+=end code
+
+Returns the given string with any diacritcs removed.
+
+=head2 has-marks
+
+=begin code :lang<raku>
+
+say has-marks("foo👩🏽‍💻bar");             # False
+say has-marks("fóöbar");               # True
+
+=end code
+
+Returns a C<Bool> indicating whether the given string contains any
+alphanumeric characters with marks (accents).
+
+=head2 leading-whitespace
+
+=begin code :lang<raku>
+
+dd leading-whitespace("foo");      # ""
+dd leading-whitespace(" \t foo");  # " \t "
+dd leading-whitespace(" \t ");     # " \t "
+
+=end code
+
+Returns a C<Str> containing any leading whitespace of the given string.
+
+=head2 trailing-whitespace
+
+=begin code :lang<raku>
+
+dd trailing-whitespace("bar");      # ""
+dd trailing-whitespace("bar \t ");  # " \t "
+dd trailing-whitespace(" \t ");     # " \t "
+
+=end code
+
+Returns a C<Str> containing any trailing whitespace of the given string.
+
+=head2 is-whitespace
+
+=begin code :lang<raku>
+
+say is-whitespace("\t \n");  # True
+say is-whitespace("\ta\n");  # False
+say is-whitespace("");       # True
+
+=end code
+
+Returns a C<Bool> indicating whether the string consists of just
+whitespace characters, or is empty.
+
+=head2 is-uppercase
+
+=begin code :lang<raku>
+
+say is-uppercase("FOOBAR");  # True
+say is-uppercase("FooBar");  # False
+say is-uppercase("");        # True
+
+=end code
+
+Returns a C<Bool> indicating whether the string consists of just
+uppercase characters, or is empty.
+
+=head2 is-lowercase
+
+=begin code :lang<raku>
+
+say is-lowercase("foobar");  # True
+say is-lowercase("FooBar");  # False
+say is-lowercase("");        # True
+
+=end code
+
+Returns a C<Bool> indicating whether the string consists of just
+lowercase characters, or is empty.
+
+=head2 consists-of
+
+=begin code :lang<raku>
+
+say consists-of("aaabbcc", "abc");     # True
+say consists-of("aaadbcc", "abc");     # False
+say consists-of("", "abc");            # True
+
+=end code
+
+Returns a C<Bool> indicating whether the string given as the first
+positional argument only consists of characters given as the second
+positional argument, or is empty.
+
+=head2 all-same
+
+=begin code :lang<raku>
+
+say all-same("aaaaaa");                # "a"
+say all-same("aaaaba");                # Nil
+say all-same("");                      # Nil
+
+=end code
+
+If the given string consists of a single character, returns that
+character.  Else returns C<Nil>.
+
+=head1 AUTHOR
+
+Elizabeth Mattijsen <liz@raku.rocks>
+
+Source can be located at: https://github.com/lizmat/String-Utils . Comments and
+Pull Requests are welcome.
+
+If you like this module, or what I’m doing more generally, committing to a
+L<small sponsorship|https://github.com/sponsors/lizmat/>  would mean a great
+deal to me!
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2022, 2023, 2024 Elizabeth Mattijsen
+
+This library is free software; you can redistribute it and/or modify it under the Artistic License 2.0.
+
+=end pod
+
+# vim: expandtab shiftwidth=4
