@@ -68,6 +68,10 @@ say all-same("");                      # Nil
 .say for paragraphs("a\n\nb");         # 0 => a␤2 => b␤
 .say for paragraphs($path.IO.lines);   # …
 
+my $string = "foo";
+my $regex  = regexify($string, :ignorecase);
+say "FOOBAR" ~~ $regex;                # ｢FOO｣
+
 use String::Utils <before after>;  # only import "before" and "after"
 
 =end code
@@ -418,6 +422,75 @@ and the value is the paragraph (without trailing newline).
 
 The optional second argument can be used to indicate the ordinal number
 of the first line in the string.
+
+=head2 regexify
+
+=begin code :lang<raku>
+
+my $string = "foo";
+my $regex  = regexify($string, :ignorecase);
+say "FOOBAR" ~~ $regex;  # ｢FOO｣
+
+=end code
+
+Produce a C<Regex> object from a given string and modifiers.  Note that this
+is similar to the C</ <$string> /> syntax.  But opposed to that syntax,
+which interpolates the contents of the string B<each time> the regex is
+executed, the C<Regex> object returned by C<regexify> is immutable.
+
+The following modifiers are supported:
+
+=head3 i / ignorecase
+
+=begin code :lang<raku>
+
+# accept haystack if "bar" is found, regardless of case
+my $regex = regexify("bar", :i);  # or :ignorecase
+
+=end code
+
+Allow characters to match even if they are of mixed case.
+
+=head3 smartcase
+
+=begin code :lang<raku>
+
+# accept haystack if "bar" is found, regardless of case
+my &anycase = regexify("bar", :smartcase);
+
+# accept haystack if "Bar" is found
+my &exactcase = regexify("Bar", :smartcase);
+
+=end code
+
+If the needle is a string and does B<not> contain any uppercase characters,
+then C<ignorecase> semantics will be assumed.
+
+=head3 m / ignoremark
+
+=begin code :lang<raku>
+
+# accept haystack if "bar" is found, regardless of any accents
+my &anycase = regexify("bar", :m);  # or :ignoremark
+
+=end code
+
+Allow characters to match even if they have accents (or not).
+
+=head3 smartmark
+
+=begin code :lang<raku>
+
+# accept haystack if "bar" is found, regardless of any accents
+my &anymark = regexify("bar", :smartmark);
+
+# accept haystack if "bår" is found
+my &exactmark = regexify("bår", :smartmark);
+
+=end code
+
+If the needle is a string and does B<not> contain any characters with accents,
+then C<ignoremark> semantics will be assumed.
 
 =head1 AUTHOR
 

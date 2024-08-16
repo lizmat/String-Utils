@@ -462,6 +462,21 @@ my multi sub paragraphs(Cool:D $string, Int:D $initial = 0) {
     paragraphs $string.Str.lines, $initial
 }
 
+my sub regexify(str $spec, *%_) {
+    my str $i = %_<i>
+      || %_<ignorecase>
+      || ((%_<m> || %_<smartcase>) && is-lowercase($spec))
+      ?? ':i '
+      !! '';
+    my str $m = %_<m>
+      || %_<ignoremark>
+      || ((%_<m> || %_<smartmark>) && !has-marks($spec))
+      ?? ':m '
+      !! '';
+
+    "/$i$m$spec/".EVAL  # until there's a better solution
+}
+
 my sub EXPORT(*@names) {
     Map.new: @names
       ?? @names.map: {

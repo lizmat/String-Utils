@@ -3,7 +3,7 @@ use Test;
 my constant @subs = <
   after all-same around before between between-included chomp-needle
   consists-of has-marks is-sha1 is-lowercase is-uppercase is-whitespace
-  leading-whitespace leaf letters ngram non-word root stem
+  leading-whitespace leaf letters ngram non-word regexify root stem
   trailing-whitespace
 >;
 

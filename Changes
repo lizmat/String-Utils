@@ -2,6 +2,9 @@ Revision history for String-Utils
 
 {{$NEXT}}
 
+0.0.26  2024-08-16T13:53:24+02:00
+    - Add support for "regexify"
+
 0.0.25  2024-08-05T16:32:56+02:00
     - Add support for "paragraphs"
     - Separate documentation into a separate file

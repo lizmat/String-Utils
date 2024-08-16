@@ -1,0 +1,32 @@
+BEGIN %*ENV<RAKU_TEST_DIE_ON_FAIL> = 1;
+
+use Test;
+use String::Utils;
+
+my @tests = 
+  \('\w+'),              "foobar", "foobar",
+  \('foo', :i),          "FOOBAR", "FOO",
+  \('foo', :ignorecase), "FOOBAR", "FOO",
+  \('foo', :smartcase),  "FOOBAR", "FOO",
+  \('FOO', :m),          "FÖOBAR", "FÖO",
+  \('FOO', :ignoremark), "FÖOBAR", "FÖO",
+  \('FOO', :smartmark),  "FÖOBAR", "FÖO",
+;
+
+plan @tests / 3;
+
+for @tests -> $capture, $haystack, $result {
+    subtest "Checking '$capture.raku.substr(2,*-1)'" => {
+        plan 3;
+
+        my $regex := regexify(|$capture);
+        isa-ok $regex, Regex;
+
+        $haystack ~~ $regex;
+        isa-ok $/, Match;
+
+        is $/.Str, $result, "did '$haystack' produce '$result'";
+    }
+}
+
+# vim: expandtab shiftwidth=4
