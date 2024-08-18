@@ -396,15 +396,17 @@ my sub all-same(str $string) {
 }
 
 my proto sub paragraphs(|) {*}
-my multi sub paragraphs(@source, Int:D $initial = 0) {
+my multi sub paragraphs(@source, Int:D $initial = 0, :$Pair = Pair) {
     my class Paragraphs does Iterator {
         has     $!iterator;
         has int $!line;
+        has     $!Pair;
 
-        method new($iterator, int $line) {
+        method new($iterator, int $line, $Pair) {
             my $self := nqp::create(self);
             nqp::bindattr(  $self,Paragraphs,'$!iterator',$iterator);
             nqp::bindattr_i($self,Paragraphs,'$!line',    $line - 1);
+            nqp::bindattr(  $self,Paragraphs,'$!Pair',    $Pair);
             $self
         }
 
@@ -419,7 +421,7 @@ my multi sub paragraphs(@source, Int:D $initial = 0) {
             my sub paragraph() {
                $!line = $line;
 
-               Pair.new(
+               $!Pair.new(
                   $line - nqp::elems($collected),
                   nqp::join("\n", $collected)
                )
@@ -456,10 +458,10 @@ my multi sub paragraphs(@source, Int:D $initial = 0) {
     }
 
     # Produce the sequence
-    Seq.new: Paragraphs.new(@source.iterator, $initial)
+    Seq.new: Paragraphs.new(@source.iterator, $initial, $Pair)
 }
-my multi sub paragraphs(Cool:D $string, Int:D $initial = 0) {
-    paragraphs $string.Str.lines, $initial
+my multi sub paragraphs(Cool:D $string, Int:D $initial = 0, :$Pair = Pair) {
+    paragraphs $string.Str.lines, $initial, :$Pair
 }
 
 my sub regexify(str $spec, *%_) {

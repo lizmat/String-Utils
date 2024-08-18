@@ -2,6 +2,10 @@ Revision history for String-Utils
 
 {{$NEXT}}
 
+0.0.27  2024-08-18T12:20:10+02:00
+    - Add support for ":Pair" named argument to "paragraphs" to set
+      the class with which to create the objects
+
 0.0.26  2024-08-16T13:53:24+02:00
     - Add support for "regexify"
 

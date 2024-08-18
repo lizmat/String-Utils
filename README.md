@@ -360,6 +360,13 @@ Lazily produces a `Seq` of `Pairs` with paragraphs from a `Seq` or string in whi
 
 The optional second argument can be used to indicate the ordinal number of the first line in the string.
 
+```raku
+my class A is Pair { }
+.say for paragraphs("a\n\nb", 1, :Pair(A));  # 1 => a␤3 => b␤
+```
+
+Also takes an optional named argument `:Pair` that indicates the class with which the objects should be created. This defailts to the core `Pair` class.
+
 regexify
 --------
 
