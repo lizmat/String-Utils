@@ -356,13 +356,13 @@ paragraphs
 .say for paragraphs("a\n\nb", 1);      # 1 => a␤3 => b␤
 ```
 
-Lazily produces a `Seq` of `Pairs` with paragraphs from a `Seq` or string in which the key is the line number where the paragraph starts, and the value is the paragraph (without trailing newline).
+Lazily produces a `Seq` of `Pairs` with paragraphs from a `Seq` or string in which the key is the line number where the paragraph starts, and the value is the paragraph (without **last** trailing newline).
 
 The optional second argument can be used to indicate the ordinal number of the first line in the string.
 
 ```raku
 my class A is Pair { }
-.say for paragraphs("a\n\nb", 1, :Pair(A));  # 1 => a␤3 => b␤
+.say for paragraphs("a\n\nb", 1, :Pair(A));  # 1 => a␤␤3 => b␤
 ```
 
 Also takes an optional named argument `:Pair` that indicates the class with which the objects should be created. This defailts to the core `Pair` class.

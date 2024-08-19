@@ -418,7 +418,7 @@ character.  Else returns C<Nil>.
 
 Lazily produces a C<Seq> of C<Pairs> with paragraphs from a C<Seq> or
 string in which the key is the line number where the paragraph starts,
-and the value is the paragraph (without trailing newline).
+and the value is the paragraph (without B<last> trailing newline).
 
 The optional second argument can be used to indicate the ordinal number
 of the first line in the string.
@@ -426,7 +426,7 @@ of the first line in the string.
 =begin code :lang<raku>
 
 my class A is Pair { }
-.say for paragraphs("a\n\nb", 1, :Pair(A));  # 1 => a␤3 => b␤
+.say for paragraphs("a\n\nb", 1, :Pair(A));  # 1 => a␤␤3 => b␤
 
 =end code
 

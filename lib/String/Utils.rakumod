@@ -399,12 +399,14 @@ my proto sub paragraphs(|) {*}
 my multi sub paragraphs(@source, Int:D $initial = 0, :$Pair = Pair) {
     my class Paragraphs does Iterator {
         has     $!iterator;
+        has str $!next;
         has int $!line;
         has     $!Pair;
 
         method new($iterator, int $line, $Pair) {
             my $self := nqp::create(self);
             nqp::bindattr(  $self,Paragraphs,'$!iterator',$iterator);
+            nqp::bindattr_s($self,Paragraphs,'$!next',    nqp::null_s);
             nqp::bindattr_i($self,Paragraphs,'$!line',    $line - 1);
             nqp::bindattr(  $self,Paragraphs,'$!Pair',    $Pair);
             $self
@@ -417,9 +419,17 @@ my multi sub paragraphs(@source, Int:D $initial = 0, :$Pair = Pair) {
 
             # Production logic
             my int $line   = $!line;
+            my int $done;    # 1 if paragraph is done
             my $collected := nqp::list_s;
-            my sub paragraph() {
+
+            unless nqp::isnull_s($!next) {
+                nqp::push_s($collected,$!next);
+                $!next = nqp::null_s;
+            }
+
+            my sub paragraph(str $next) {
                $!line = $line;
+               $!next = $next;
 
                $!Pair.new(
                   $line - nqp::elems($collected),
@@ -434,20 +444,30 @@ my multi sub paragraphs(@source, Int:D $initial = 0, :$Pair = Pair) {
                 ++$line,
                 nqp::if(
                   is-whitespace($_),
-                  nqp::if(
-                    nqp::elems($collected),
-                    (return paragraph)
+                  nqp::stmts(
+                    nqp::push_s($collected,$_),
+                    ($done = 1)
                   ),
-                  nqp::push_s($collected, $_)
+                  nqp::if(                 # not whitespace
+                    $done,
+                    (return paragraph($_)),
+                    nqp::push_s($collected, $_)
+                  )
                 )
               )
             );
 
+            # Single line after last paraghraph
+            if $!next {
+                $!iterator := nqp::null;
+                $!next
+            }
+
             # Still need to produce final paragraph
-            if nqp::elems($collected) {
+            elsif nqp::elems($collected) {
                 $!iterator := nqp::null;
                 ++$line;
-                paragraph
+                paragraph("")
             }
 
             # No final paragraph, we're done
