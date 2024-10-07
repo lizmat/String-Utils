@@ -505,7 +505,7 @@ my &exactmark = regexify("bår", :smartmark);
 If the needle is a string and does B<not> contain any characters with
 accents, then C<ignoremark> semantics will be assumed.
 
-=head expand-tab
+=head2 expand-tab
 
 =begin code :lang<raku>
 

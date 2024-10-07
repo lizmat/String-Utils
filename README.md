@@ -424,10 +424,8 @@ my &exactmark = regexify("bår", :smartmark);
 
 If the needle is a string and does **not** contain any characters with accents, then `ignoremark` semantics will be assumed.
 
-head
-====
-
 expand-tab
+----------
 
 ```raku
 dd expand-tab("a\tbb\tccc",4);  # "a   bb  ccc"
