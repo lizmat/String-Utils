@@ -2,6 +2,9 @@ Revision history for String-Utils
 
 {{$NEXT}}
 
+0.0.29  2024-10-07T15:15:34+02:00
+    - Add support for "expand-tab"
+
 0.0.28  2024-08-19T15:42:49+02:00
     - Adapt "paragraphs" so that any text split with this subroutine
       will roundtrip with its source when the values are joined with "\n"

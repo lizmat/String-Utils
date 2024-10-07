@@ -72,6 +72,8 @@ my $string = "foo";
 my $regex  = regexify($string, :ignorecase);
 say "FOOBAR" ~~ $regex;                # ｢FOO｣
 
+dd expand-tab("a\tbb\tccc",4);         # "a   bb  ccc"
+
 use String::Utils <before after>;  # only import "before" and "after"
 
 =end code
@@ -474,8 +476,8 @@ my &exactcase = regexify("Bar", :smartcase);
 
 =end code
 
-If the needle is a string and does B<not> contain any uppercase characters,
-then C<ignorecase> semantics will be assumed.
+If the needle is a string and does B<not> contain any uppercase
+characters, then C<ignorecase> semantics will be assumed.
 
 =head3 m / ignoremark
 
@@ -500,8 +502,24 @@ my &exactmark = regexify("bår", :smartmark);
 
 =end code
 
-If the needle is a string and does B<not> contain any characters with accents,
-then C<ignoremark> semantics will be assumed.
+If the needle is a string and does B<not> contain any characters with
+accents, then C<ignoremark> semantics will be assumed.
+
+=head expand-tab
+
+=begin code :lang<raku>
+
+dd expand-tab("a\tbb\tccc",4);  # "a   bb  ccc"
+
+=end code
+
+Expand any tabs in a string (the first argument) to the given tab
+width (the second argument).  If there are no tabs, then the given
+string will be returned unaltered.
+
+If the tab width is B<zero> or B<negative>, will remove any tabs
+from the string.  If the tab width is B<one>, then all tabs will
+be replaced by spaces.
 
 =head1 AUTHOR
 

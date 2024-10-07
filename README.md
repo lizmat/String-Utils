@@ -73,6 +73,8 @@ my $string = "foo";
 my $regex  = regexify($string, :ignorecase);
 say "FOOBAR" ~~ $regex;                # ｢FOO｣
 
+dd expand-tab("a\tbb\tccc",4);         # "a   bb  ccc"
+
 use String::Utils <before after>;  # only import "before" and "after"
 ```
 
@@ -421,6 +423,19 @@ my &exactmark = regexify("bår", :smartmark);
 ```
 
 If the needle is a string and does **not** contain any characters with accents, then `ignoremark` semantics will be assumed.
+
+head
+====
+
+expand-tab
+
+```raku
+dd expand-tab("a\tbb\tccc",4);  # "a   bb  ccc"
+```
+
+Expand any tabs in a string (the first argument) to the given tab width (the second argument). If there are no tabs, then the given string will be returned unaltered.
+
+If the tab width is **zero** or **negative**, will remove any tabs from the string. If the tab width is **one**, then all tabs will be replaced by spaces.
 
 AUTHOR
 ======

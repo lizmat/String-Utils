@@ -499,6 +499,47 @@ my sub regexify(str $spec, *%_) {
     "/$i$m$spec/".EVAL  # until there's a better solution
 }
 
+my sub expand-tab(str $spec, int $size) {
+    my str @parts = nqp::split("\t",$spec);
+
+    # need to do something
+    if nqp::elems(@parts) > 1 {
+
+        # just remove tabs
+        if $size <= 0 {
+            nqp::join("",@parts)
+        }
+
+        # just replace tab by space
+        elsif $size == 1 {
+            nqp::join(" ",@parts)
+        }
+
+        # need to calculate columns
+        else {
+            my int $end = nqp::elems(@parts) - 1;
+            my int $width;
+            my int $i = -1;
+            nqp::while(
+              nqp::islt_i(++$i,$end),
+              nqp::stmts(
+                (my str $part = nqp::atpos_s(@parts,$i)),
+                ($width = $width + nqp::chars($part)),
+                (my int $add = $size - nqp::mod_i($width,$size)),
+                nqp::bindpos_s(@parts,$i,nqp::concat($part,nqp::x(' ',$add))),
+                ($width = $width + $add)
+              )
+            );
+            nqp::join('',@parts)
+        }
+    }
+
+    # nothing to do
+    else {
+        $spec
+    }
+}
+
 my sub EXPORT(*@names) {
     Map.new: @names
       ?? @names.map: {

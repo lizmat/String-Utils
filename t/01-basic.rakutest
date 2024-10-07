@@ -1,7 +1,7 @@
 use Test;
 use String::Utils;
 
-plan 75;
+plan 79;
 
 is after("foobar","foo"),       "bar", 'after(foo) ok?';
 is "foobar".&after("foo"),      "bar", '.&after(foo) ok?';
@@ -117,6 +117,12 @@ my $text = "\na\n\nb\n\n\nc";
 is-deeply paragraphs($text).map(*.value).join("\n"), $text,
   'can we round-trip with .join("\n")?';
 
-is paragraphs($*PROGRAM.lines).elems, 29, 'reading from file lazily';
+is paragraphs($*PROGRAM.lines).elems, 30, 'reading from file lazily';
+
+my str $base = "a\tbb\tccc\tdddd\teeeee";
+is expand-tab($base,0), "abbcccddddeeeee", '0 removes tabs';
+is expand-tab($base,1), "a bb ccc dddd eeeee", '1 replaces tab with space';
+is expand-tab($base,4), "a   bb  ccc dddd    eeeee", '4 is ok';
+is expand-tab("foo",4), "foo", 'no tabs ok';
 
 # vim: expandtab shiftwidth=4
