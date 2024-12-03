@@ -544,34 +544,29 @@ my sub word-at(str $string, int $cursor) {
 
     # something to look at
     if $cursor >= 0 && nqp::chars($string) -> int $length {
-        if $cursor {
-            my int $last;
-            my int $pos;
-            nqp::while(
-              $last < $length && ($pos = nqp::findcclass(
-                nqp::const::CCLASS_WHITESPACE,
-                $string,
-                $last,
-                $length - $last
-              )) < $cursor,
-              ($last = $pos + 1)
-            );
-            $last >= $length
-              ?? Nil
-              !! ($last, $pos - $last)
-        }
-
-        # cursor at start, so the first word will do
-        else {
-            (0, nqp::findcclass(
-              nqp::const::CCLASS_WHITESPACE,$string,0,$length
-            ));
-        }
+        my int $last;
+        my int $pos;
+        my int $index;
+        nqp::while(
+          $last < $length && ($pos = nqp::findcclass(
+            nqp::const::CCLASS_WHITESPACE,
+            $string,
+            $last,
+            $length - $last
+          )) < $cursor,
+          nqp::stmts(
+            nqp::if($pos > $last, ++$index),
+            ($last  = $pos + 1)
+          )
+        );
+        $last >= $length || $pos == $last
+          ?? Empty
+          !! ($last, $pos - $last, $index)
     }
 
     # nothing to look at
     else {
-        Nil
+        Empty
     }
 }
 

@@ -1,7 +1,7 @@
 use Test;
 use String::Utils;
 
-plan 93;
+plan 109;
 
 is after("foobar","foo"),       "bar", 'after(foo) ok?';
 is "foobar".&after("foo"),      "bar", '.&after(foo) ok?';
@@ -117,8 +117,6 @@ my $text = "\na\n\nb\n\n\nc";
 is-deeply paragraphs($text).map(*.value).join("\n"), $text,
   'can we round-trip with .join("\n")?';
 
-is paragraphs($*PROGRAM.lines).elems, 31, 'reading from file lazily';
-
 my str $base = "a\tbb\tccc\tdddd\teeeee";
 is-deeply expand-tab($base,0), "abbcccddddeeeee", '0 removes tabs';
 is-deeply expand-tab($base,1), "a bb ccc dddd eeeee", '1 replaces tab w/space';
@@ -126,9 +124,17 @@ is-deeply expand-tab($base,4), "a   bb  ccc dddd    eeeee", '4 is ok';
 is-deeply expand-tab("foo",4), "foo", 'no tabs ok';
 
 my str $string = "foo bar baz";
-is-deeply word-at($string, $_), Nil, "no word at $_" for -1, 12;
-is-deeply word-at($string, $_), (0,3), "'foo' at $_" for 0 .. 3;
-is-deeply word-at($string, $_), (4,3), "'bar' at $_" for 4 .. 7;
-is-deeply word-at($string, $_), (8,3), "'baz' at $_" for 8 .. 11;
+is-deeply word-at($string, $_), Empty, "no word at $_" for -1, 12;
+is-deeply word-at($string, $_), (0,3,0), "'foo' at $_" for 0 .. 3;
+is-deeply word-at($string, $_), (4,3,1), "'bar' at $_" for 4 .. 7;
+is-deeply word-at($string, $_), (8,3,2), "'baz' at $_" for 8 .. 11;
+
+$string = " foo  bar baz";
+is-deeply word-at($string, $_), Empty, "no word at $_" for -1, 0, 5, 14;
+is-deeply word-at($string, $_), ( 1,3,0), "'foo' at $_" for 1 .. 4;
+is-deeply word-at($string, $_), ( 6,3,1), "'bar' at $_" for 6 .. 9;
+is-deeply word-at($string, $_), (10,3,2), "'baz' at $_" for 10 .. 13;
+
+is paragraphs($*PROGRAM.lines).elems, 32, 'reading from file lazily';
 
 # vim: expandtab shiftwidth=4

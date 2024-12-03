@@ -527,13 +527,15 @@ be replaced by spaces.
 
 =begin code :lang<raku>
 
-say word-at("foo bar baz", 5);  # (4 3)
+say word-at("foo bar baz", 5);  # (4 3 1)
 
 =end code
 
-Returns a C<List> with the start position and its length of the word
-found in the given string at the given position, or directly before it.
-Return C<Nil> if no word could be found at the given position, or the
+Returns a C<List> with the start position, the number of characters of
+the word, and the ordinal number of the word found in the given string
+at the given position, or directly before it (using C<.words> semantics).
+
+Returns C<Empty> if no word could be found at the given position, or the
 position was out of range.
 
 =head1 AUTHOR

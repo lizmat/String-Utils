@@ -2,6 +2,10 @@ Revision history for String-Utils
 
 {{$NEXT}}
 
+0.0.31  2024-12-03T22:36:38+01:00
+    - Make "word-at" also return the ordinal number of the word in
+      string, and return Empty if not found (instead of Nil)
+
 0.0.30  2024-12-03T20:42:23+01:00
     - Add support for "word-at"
 

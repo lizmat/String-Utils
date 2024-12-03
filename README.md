@@ -441,10 +441,12 @@ word-at
 -------
 
 ```raku
-say word-at("foo bar baz", 5);  # (4 3)
+say word-at("foo bar baz", 5);  # (4 3 1)
 ```
 
-Returns a `List` with the start position and its length of the word found in the given string at the given position, or directly before it. Return `Nil` if no word could be found at the given position, or the position was out of range.
+Returns a `List` with the start position, the number of characters of the word, and the ordinal number of the word found in the given string at the given position, or directly before it (using `.words` semantics).
+
+Returns `Empty` if no word could be found at the given position, or the position was out of range.
 
 AUTHOR
 ======
