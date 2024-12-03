@@ -75,6 +75,8 @@ say "FOOBAR" ~~ $regex;                # ｢FOO｣
 
 dd expand-tab("a\tbb\tccc",4);         # "a   bb  ccc"
 
+say word-at("foo bar baz", 5);         # (4 3)
+
 use String::Utils <before after>;  # only import "before" and "after"
 ```
 
@@ -434,6 +436,15 @@ dd expand-tab("a\tbb\tccc",4);  # "a   bb  ccc"
 Expand any tabs in a string (the first argument) to the given tab width (the second argument). If there are no tabs, then the given string will be returned unaltered.
 
 If the tab width is **zero** or **negative**, will remove any tabs from the string. If the tab width is **one**, then all tabs will be replaced by spaces.
+
+word-at
+-------
+
+```raku
+say word-at("foo bar baz", 5);  # (4 3)
+```
+
+Returns a `List` with the start position and its length of the word found in the given string at the given position, or directly before it. Return `Nil` if no word could be found at the given position, or the position was out of range.
 
 AUTHOR
 ======

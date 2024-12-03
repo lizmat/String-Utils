@@ -540,6 +540,41 @@ my sub expand-tab(str $spec, int $size) {
     }
 }
 
+my sub word-at(str $string, int $cursor) {
+
+    # something to look at
+    if $cursor >= 0 && nqp::chars($string) -> int $length {
+        if $cursor {
+            my int $last;
+            my int $pos;
+            nqp::while(
+              $last < $length && ($pos = nqp::findcclass(
+                nqp::const::CCLASS_WHITESPACE,
+                $string,
+                $last,
+                $length - $last
+              )) < $cursor,
+              ($last = $pos + 1)
+            );
+            $last >= $length
+              ?? Nil
+              !! ($last, $pos - $last)
+        }
+
+        # cursor at start, so the first word will do
+        else {
+            (0, nqp::findcclass(
+              nqp::const::CCLASS_WHITESPACE,$string,0,$length
+            ));
+        }
+    }
+
+    # nothing to look at
+    else {
+        Nil
+    }
+}
+
 my sub EXPORT(*@names) {
     Map.new: @names
       ?? @names.map: {
