@@ -2,6 +2,10 @@ Revision history for String-Utils
 
 {{$NEXT}}
 
+0.0.32  2024-12-16T17:13:30+01:00
+    - Add support for "abbrev", inspired by Text::Abbrev by
+      Kamila Borowska
+
 0.0.31  2024-12-03T22:36:38+01:00
     - Make "word-at" also return the ordinal number of the word in
       string, and return Empty if not found (instead of Nil)

@@ -77,6 +77,8 @@ dd expand-tab("a\tbb\tccc",4);         # "a   bb  ccc"
 
 say word-at("foo bar baz", 5);         # (4 3)
 
+say abbrev(<yes no>).keys.sort;        # (n no y ye yes)
+
 use String::Utils <before after>;  # only import "before" and "after"
 ```
 
@@ -447,6 +449,19 @@ say word-at("foo bar baz", 5);  # (4 3 1)
 Returns a `List` with the start position, the number of characters of the word, and the ordinal number of the word found in the given string at the given position, or directly before it (using `.words` semantics).
 
 Returns `Empty` if no word could be found at the given position, or the position was out of range.
+
+abbrev
+------
+
+```raku
+say abbrev(<yes no>).keys.sort;       # (n no y ye yes)
+
+say abbrev(<foo bar baz>).keys.sort;  # (bar baz f fo foo)
+```
+
+Takes 0 or more strings as arguments, and returns a `Map` with all shortest possible unambigious versions of the given strings as keys, and their associated original string as the value.
+
+Inspired by Text::Abbrev module by KamilaBorowska.
 
 AUTHOR
 ======

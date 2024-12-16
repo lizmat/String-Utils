@@ -570,6 +570,38 @@ my sub word-at(str $string, int $cursor) {
     }
 }
 
+my proto sub abbrev(|) {*}
+my multi sub abbrev() { BEGIN Map.new }
+my multi sub abbrev(*@words) { abbrev(@words) }
+my multi sub abbrev(@words) {
+    my $result := Map.new;
+    my $seen   := nqp::getattr($result,Map,'$!storage');
+    for @words -> str $word {
+        nqp::bindkey($seen,$word,$word);
+
+        my int $chars = nqp::chars($word);
+        nqp::while(
+          --$chars > 0,
+          nqp::stmts(
+            (my str $needle = nqp::substr($word,0,$chars)),
+            nqp::if(
+              nqp::existskey($seen,$needle),
+              nqp::stmts(
+                nqp::deletekey($seen,$needle),
+                nqp::while(
+                  --$chars,
+                  nqp::deletekey($seen,nqp::substr($word,0,$chars))
+                )
+              ),
+              nqp::bindkey($seen,$needle,$word)
+            )
+          )
+        );
+    }
+
+    $result
+}
+
 my sub EXPORT(*@names) {
     Map.new: @names
       ?? @names.map: {
