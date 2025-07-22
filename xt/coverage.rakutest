@@ -1,10 +1,10 @@
 use Test::Coverage;
 
-todo("not enough coverage yet");
-coverage-at-least 80;  # ok if at least 80% of lines is covered
+plan 2;
 
-todo("not enough coverage yet");
-uncovered-at-most 10;
+coverage-at-least 79;
+
+uncovered-at-most 24;
 
 report;
 
