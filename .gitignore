@@ -1,3 +1,4 @@
 .precomp/
 /String-Utils-*
 /releases/
+*.rakucov

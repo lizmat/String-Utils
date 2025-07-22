@@ -146,6 +146,8 @@ my sub chomp-needle(str $haystack, str $needle) {
       !! $haystack
 }
 
+my sub sha1(str $needle) { nqp::sha1($needle) }
+
 my sub is-sha1(str $needle) {
     my int $i;
     if nqp::chars($needle) == 40 {

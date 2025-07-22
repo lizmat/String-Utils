@@ -1,0 +1,13 @@
+use Test::Coverage;
+
+todo("not enough coverage yet");
+coverage-at-least 80;  # ok if at least 80% of lines is covered
+
+todo("not enough coverage yet");
+uncovered-at-most 10;
+
+report;
+
+source-with-coverage;
+
+# vim: expandtab shiftwidth=4

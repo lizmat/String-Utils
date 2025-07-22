@@ -11,60 +11,59 @@ SYNOPSIS
 ```raku
 use String::Utils;
 
+say abbrev(<yes no>).keys.sort;        # (n no y ye yes)
+
+say after("foobar","foo");             # bar
+
+say all-same("aaaaaa");                # "a"
+say all-same("aaaaba");                # Nil
+say all-same("");                      # Nil
+
+say around("foobarbaz", "ob", "rb");   # foaz
+
 say before("foobar","bar");            # foo
 
 say between("foobarbaz","foo","baz");  # bar
 
 say between-included("foobarbaz","oo","baz");  # oobarbaz
 
-say around("foobarbaz", "ob", "rb");   # foaz
-
-say after("foobar","foo");             # bar
-
 say chomp-needle("foobarbaz", "baz");  # foobar
-
-say root <abcd abce abde>;             # ab
-
-say leaf <zip.txt zop.txt ff.txt>;     # .txt
-
-say is-sha1 "foo bar baz";             # False
-
-say stem "foo.tar.gz";                 # foo
-say stem "foo.tar.gz", 1;              # foo.tar
-
-say ngram "foobar", 3;                 # foo oob oba bar
-
-say non-word "foobar";                 # False
-say non-word "foo/bar";                # True
-
-say letters("//foo:bar");              # foobar
-
-say nomark("élève");                   # eleve
-
-say has-marks("foo👩🏽‍💻bar");             # False
-say has-marks("fóöbar");               # True
-
-dd leading-whitespace(" \t foo");      # " \t "
-dd trailing-whitespace("bar \t ");     # " \t "
-say is-whitespace("\t \n");            # True
-say is-whitespace("\ta\n");            # False
-say is-whitespace("");                 # True
-
-say is-uppercase("FOOBAR");            # True
-say is-uppercase("FooBar");            # False
-say is-uppercase("");                  # True
-
-say is-lowercase("foobar");            # True
-say is-lowercase("FooBar");            # False
-say is-lowercase("");                  # True
 
 say consists-of("aaabbcc", "abc");     # True
 say consists-of("aaadbcc", "abc");     # False
 say consists-of("", "abc");            # True
 
-say all-same("aaaaaa");                # "a"
-say all-same("aaaaba");                # Nil
-say all-same("");                      # Nil
+dd expand-tab("a\tbb\tccc",4);         # "a   bb  ccc"
+
+say has-marks("foo👩🏽‍💻bar");             # False
+say has-marks("fóöbar");               # True
+
+say is-lowercase("foobar");            # True
+say is-lowercase("FooBar");            # False
+say is-lowercase("");                  # True
+
+say is-sha1 "foo bar baz";             # False
+
+say is-uppercase("FOOBAR");            # True
+say is-uppercase("FooBar");            # False
+say is-uppercase("");                  # True
+
+say is-whitespace("\t \n");            # True
+say is-whitespace("\ta\n");            # False
+say is-whitespace("");                 # True
+
+dd leading-whitespace(" \t foo");      # " \t "
+
+say leaf <zip.txt zop.txt ff.txt>;     # .txt
+
+say letters("//foo:bar");              # foobar
+
+say ngram "foobar", 3;                 # foo oob oba bar
+
+say nomark("élève");                   # eleve
+
+say non-word "foobar";                 # False
+say non-word "foo/bar";                # True
 
 .say for paragraphs("a\n\nb");         # 0 => a␤2 => b␤
 .say for paragraphs($path.IO.lines);   # …
@@ -73,11 +72,16 @@ my $string = "foo";
 my $regex  = regexify($string, :ignorecase);
 say "FOOBAR" ~~ $regex;                # ｢FOO｣
 
-dd expand-tab("a\tbb\tccc",4);         # "a   bb  ccc"
+say root <abcd abce abde>;             # ab
 
-say word-at("foo bar baz", 5);         # (4 3)
+say sha1("foo bar baz";                # C7567E8B39E...
 
-say abbrev(<yes no>).keys.sort;        # (n no y ye yes)
+say stem "foo.tar.gz";                 # foo
+say stem "foo.tar.gz", 1;              # foo.tar
+
+dd trailing-whitespace("bar \t ");     # " \t "
+
+say word-at("foo bar baz", 5);         # (4 3 1)
 
 use String::Utils <before after>;  # only import "before" and "after"
 ```
@@ -109,6 +113,19 @@ say common-start <abcd abce abde>;  # ab
 SUBROUTINES
 ===========
 
+abbrev
+------
+
+```raku
+say abbrev(<yes no>).keys.sort;       # (n no y ye yes)
+
+say abbrev(<foo bar baz>).keys.sort;  # (bar baz f fo foo)
+```
+
+Takes 0 or more strings as arguments, and returns a `Map` with all shortest possible unambigious versions of the given strings as keys, and their associated original string as the value.
+
+Inspired by Text::Abbrev module by KamilaBorowska.
+
 after
 -----
 
@@ -121,6 +138,17 @@ say after("foobar","goo");   # Nil
 ```
 
 Return the string **after** a given string, or `Nil` if the given string could not be found. The equivalent of the stringification of `/ <?after foo> .* /`.
+
+all-same
+--------
+
+```raku
+say all-same("aaaaaa");                # "a"
+say all-same("aaaaba");                # Nil
+say all-same("");                      # Nil
+```
+
+If the given string consists of a single character, returns that character. Else returns `Nil`.
 
 around
 ------
@@ -187,84 +215,27 @@ say chomp-needle("foobarbaz","bar");   # foobarbaz
 
 Return the string without the given target string at the end, or the string itself if the target string is not at the end. The equivalent of `.subst(/ baz $/)`.
 
-root
-----
+consists-of
+-----------
 
 ```raku
-say root <abcd abce abde>;  # ab
+say consists-of("aaabbcc", "abc");     # True
+say consists-of("aaadbcc", "abc");     # False
+say consists-of("", "abc");            # True
 ```
 
-Return the common **beginning** of the given strings, or the empty string if no common string could be found. See also `leaf`.
+Returns a `Bool` indicating whether the string given as the first positional argument only consists of characters given as the second positional argument, or is empty.
 
-leaf
-----
+expand-tab
+----------
 
 ```raku
-say leaf <zip.txt zop.txt ff.txt>;  # .txt
+dd expand-tab("a\tbb\tccc",4);  # "a   bb  ccc"
 ```
 
-Return the common **end** of the given strings, or the empty string if no common string could be found. See also `root`.
+Expand any tabs in a string (the first argument) to the given tab width (the second argument). If there are no tabs, then the given string will be returned unaltered.
 
-is-sha1
--------
-
-```raku
-say is-sha1 "abcd abce abde";  # False
-say is-sha1 "356A192B7913B04C54574D18C28D46E6395428AB";  # True
-```
-
-Return a `Bool` indicating whether the given string is a SHA1 string (40 chars and only containing 0123456789ABCDEF).
-
-stem
-----
-
-```raku
-say stem "foo.tar.gz";     # foo
-say stem "foo.tar.gz", 1;  # foo.tar
-say stem "foo.tar.gz", *;  # foo
-```
-
-Return the stem of a string with all of its extensions removed. Optionally accepts a second argument indicating the number of extensions to be removed. This may be `*` (aka `Whatever`) to indicate to remove all extensions.
-
-ngram
------
-
-```raku
-say ngram "foobar", 3;            # foo oob oba bar
-
-say ngram "foobar", 4, :partial;  # foob ooba obar bar ar r
-```
-
-Return a sequence of substrings of the given size, while only moving up one position at a time in the original string. Optionally takes a `:partial` flag to also produce incomplete substrings at the end of the sequence.
-
-non-word
---------
-
-```raku
-say non-word "foobar";   # False
-
-say non-word "foo/bar";  # True
-```
-
-Returns a `Bool` indicating whether the string contained **any** non-word characters.
-
-letters
--------
-
-```raku
-say letters("//foo:bar");  # foobar
-```
-
-Returns all of the alphanumeric characters in the given string as a string.
-
-nomark
-------
-
-```raku
-say nomark("élève");  # eleve
-```
-
-Returns the given string with any diacritcs removed.
+If the tab width is **zero** or **negative**, will remove any tabs from the string. If the tab width is **one**, then all tabs will be replaced by spaces.
 
 has-marks
 ---------
@@ -275,50 +246,6 @@ say has-marks("fóöbar");               # True
 ```
 
 Returns a `Bool` indicating whether the given string contains any alphanumeric characters with marks (accents).
-
-leading-whitespace
-------------------
-
-```raku
-dd leading-whitespace("foo");      # ""
-dd leading-whitespace(" \t foo");  # " \t "
-dd leading-whitespace(" \t ");     # " \t "
-```
-
-Returns a `Str` containing any leading whitespace of the given string.
-
-trailing-whitespace
--------------------
-
-```raku
-dd trailing-whitespace("bar");      # ""
-dd trailing-whitespace("bar \t ");  # " \t "
-dd trailing-whitespace(" \t ");     # " \t "
-```
-
-Returns a `Str` containing any trailing whitespace of the given string.
-
-is-whitespace
--------------
-
-```raku
-say is-whitespace("\t \n");  # True
-say is-whitespace("\ta\n");  # False
-say is-whitespace("");       # True
-```
-
-Returns a `Bool` indicating whether the string consists of just whitespace characters, or is empty.
-
-is-uppercase
-------------
-
-```raku
-say is-uppercase("FOOBAR");  # True
-say is-uppercase("FooBar");  # False
-say is-uppercase("");        # True
-```
-
-Returns a `Bool` indicating whether the string consists of just uppercase characters, or is empty.
 
 is-lowercase
 ------------
@@ -331,27 +258,97 @@ say is-lowercase("");        # True
 
 Returns a `Bool` indicating whether the string consists of just lowercase characters, or is empty.
 
-consists-of
------------
+is-sha1
+-------
 
 ```raku
-say consists-of("aaabbcc", "abc");     # True
-say consists-of("aaadbcc", "abc");     # False
-say consists-of("", "abc");            # True
+say is-sha1 "abcd abce abde";  # False
+say is-sha1 "356A192B7913B04C54574D18C28D46E6395428AB";  # True
 ```
 
-Returns a `Bool` indicating whether the string given as the first positional argument only consists of characters given as the second positional argument, or is empty.
+Return a `Bool` indicating whether the given string is a SHA1 string (40 chars and only containing 0123456789ABCDEF).
 
-all-same
+is-uppercase
+------------
+
+```raku
+say is-uppercase("FOOBAR");  # True
+say is-uppercase("FooBar");  # False
+say is-uppercase("");        # True
+```
+
+Returns a `Bool` indicating whether the string consists of just uppercase characters, or is empty.
+
+is-whitespace
+-------------
+
+```raku
+say is-whitespace("\t \n");  # True
+say is-whitespace("\ta\n");  # False
+say is-whitespace("");       # True
+```
+
+Returns a `Bool` indicating whether the string consists of just whitespace characters, or is empty.
+
+leading-whitespace
+------------------
+
+```raku
+dd leading-whitespace("foo");      # ""
+dd leading-whitespace(" \t foo");  # " \t "
+dd leading-whitespace(" \t ");     # " \t "
+```
+
+Returns a `Str` containing any leading whitespace of the given string.
+
+leaf
+----
+
+```raku
+say leaf <zip.txt zop.txt ff.txt>;  # .txt
+```
+
+Return the common **end** of the given strings, or the empty string if no common string could be found. See also `root`.
+
+letters
+-------
+
+```raku
+say letters("//foo:bar");  # foobar
+```
+
+Returns all of the alphanumeric characters in the given string as a string.
+
+ngram
+-----
+
+```raku
+say ngram "foobar", 3;            # foo oob oba bar
+
+say ngram "foobar", 4, :partial;  # foob ooba obar bar ar r
+```
+
+Return a sequence of substrings of the given size, while only moving up one position at a time in the original string. Optionally takes a `:partial` flag to also produce incomplete substrings at the end of the sequence.
+
+nomark
+------
+
+```raku
+say nomark("élève");  # eleve
+```
+
+Returns the given string with any diacritcs removed.
+
+non-word
 --------
 
 ```raku
-say all-same("aaaaaa");                # "a"
-say all-same("aaaaba");                # Nil
-say all-same("");                      # Nil
+say non-word "foobar";   # False
+
+say non-word "foo/bar";  # True
 ```
 
-If the given string consists of a single character, returns that character. Else returns `Nil`.
+Returns a `Bool` indicating whether the string contained **any** non-word characters.
 
 paragraphs
 ----------
@@ -428,16 +425,45 @@ my &exactmark = regexify("bår", :smartmark);
 
 If the needle is a string and does **not** contain any characters with accents, then `ignoremark` semantics will be assumed.
 
-expand-tab
-----------
+root
+----
 
 ```raku
-dd expand-tab("a\tbb\tccc",4);  # "a   bb  ccc"
+say root <abcd abce abde>;  # ab
 ```
 
-Expand any tabs in a string (the first argument) to the given tab width (the second argument). If there are no tabs, then the given string will be returned unaltered.
+Return the common **beginning** of the given strings, or the empty string if no common string could be found. See also `leaf`.
 
-If the tab width is **zero** or **negative**, will remove any tabs from the string. If the tab width is **one**, then all tabs will be replaced by spaces.
+sha1
+----
+
+```raku
+say sha1("foo bar baz";  # C7567E8B39E2428E38BF9C9226AC68DE4C67DC39
+```
+
+Returns a [`SHA1`](https://en.wikipedia.org/wiki/SHA-1) of the given string. It should only be used for simple identification uses, as it can no longer reliably serve in any cryptographic use.
+
+stem
+----
+
+```raku
+say stem "foo.tar.gz";     # foo
+say stem "foo.tar.gz", 1;  # foo.tar
+say stem "foo.tar.gz", *;  # foo
+```
+
+Return the stem of a string with all of its extensions removed. Optionally accepts a second argument indicating the number of extensions to be removed. This may be `*` (aka `Whatever`) to indicate to remove all extensions.
+
+trailing-whitespace
+-------------------
+
+```raku
+dd trailing-whitespace("bar");      # ""
+dd trailing-whitespace("bar \t ");  # " \t "
+dd trailing-whitespace(" \t ");     # " \t "
+```
+
+Returns a `Str` containing any trailing whitespace of the given string.
 
 word-at
 -------
@@ -449,19 +475,6 @@ say word-at("foo bar baz", 5);  # (4 3 1)
 Returns a `List` with the start position, the number of characters of the word, and the ordinal number of the word found in the given string at the given position, or directly before it (using `.words` semantics).
 
 Returns `Empty` if no word could be found at the given position, or the position was out of range.
-
-abbrev
-------
-
-```raku
-say abbrev(<yes no>).keys.sort;       # (n no y ye yes)
-
-say abbrev(<foo bar baz>).keys.sort;  # (bar baz f fo foo)
-```
-
-Takes 0 or more strings as arguments, and returns a `Map` with all shortest possible unambigious versions of the given strings as keys, and their associated original string as the value.
-
-Inspired by Text::Abbrev module by KamilaBorowska.
 
 AUTHOR
 ======
@@ -475,7 +488,7 @@ If you like this module, or what I’m doing more generally, committing to a [sm
 COPYRIGHT AND LICENSE
 =====================
 
-Copyright 2022, 2023, 2024 Elizabeth Mattijsen
+Copyright 2022, 2023, 2024, 2025 Elizabeth Mattijsen
 
 This library is free software; you can redistribute it and/or modify it under the Artistic License 2.0.
 

@@ -7,8 +7,17 @@ String::Utils - Provide some optimized string functions
 =head1 SYNOPSIS
 
 =begin code :lang<raku>
-
 use String::Utils;
+
+say abbrev(<yes no>).keys.sort;        # (n no y ye yes)
+
+say after("foobar","foo");             # bar
+
+say all-same("aaaaaa");                # "a"
+say all-same("aaaaba");                # Nil
+say all-same("");                      # Nil
+
+say around("foobarbaz", "ob", "rb");   # foaz
 
 say before("foobar","bar");            # foo
 
@@ -16,54 +25,43 @@ say between("foobarbaz","foo","baz");  # bar
 
 say between-included("foobarbaz","oo","baz");  # oobarbaz
 
-say around("foobarbaz", "ob", "rb");   # foaz
-
-say after("foobar","foo");             # bar
-
 say chomp-needle("foobarbaz", "baz");  # foobar
-
-say root <abcd abce abde>;             # ab
-
-say leaf <zip.txt zop.txt ff.txt>;     # .txt
-
-say is-sha1 "foo bar baz";             # False
-
-say stem "foo.tar.gz";                 # foo
-say stem "foo.tar.gz", 1;              # foo.tar
-
-say ngram "foobar", 3;                 # foo oob oba bar
-
-say non-word "foobar";                 # False
-say non-word "foo/bar";                # True
-
-say letters("//foo:bar");              # foobar
-
-say nomark("élève");                   # eleve
-
-say has-marks("foo👩🏽‍💻bar");             # False
-say has-marks("fóöbar");               # True
-
-dd leading-whitespace(" \t foo");      # " \t "
-dd trailing-whitespace("bar \t ");     # " \t "
-say is-whitespace("\t \n");            # True
-say is-whitespace("\ta\n");            # False
-say is-whitespace("");                 # True
-
-say is-uppercase("FOOBAR");            # True
-say is-uppercase("FooBar");            # False
-say is-uppercase("");                  # True
-
-say is-lowercase("foobar");            # True
-say is-lowercase("FooBar");            # False
-say is-lowercase("");                  # True
 
 say consists-of("aaabbcc", "abc");     # True
 say consists-of("aaadbcc", "abc");     # False
 say consists-of("", "abc");            # True
 
-say all-same("aaaaaa");                # "a"
-say all-same("aaaaba");                # Nil
-say all-same("");                      # Nil
+dd expand-tab("a\tbb\tccc",4);         # "a   bb  ccc"
+
+say has-marks("foo👩🏽‍💻bar");             # False
+say has-marks("fóöbar");               # True
+
+say is-lowercase("foobar");            # True
+say is-lowercase("FooBar");            # False
+say is-lowercase("");                  # True
+
+say is-sha1 "foo bar baz";             # False
+
+say is-uppercase("FOOBAR");            # True
+say is-uppercase("FooBar");            # False
+say is-uppercase("");                  # True
+
+say is-whitespace("\t \n");            # True
+say is-whitespace("\ta\n");            # False
+say is-whitespace("");                 # True
+
+dd leading-whitespace(" \t foo");      # " \t "
+
+say leaf <zip.txt zop.txt ff.txt>;     # .txt
+
+say letters("//foo:bar");              # foobar
+
+say ngram "foobar", 3;                 # foo oob oba bar
+
+say nomark("élève");                   # eleve
+
+say non-word "foobar";                 # False
+say non-word "foo/bar";                # True
 
 .say for paragraphs("a\n\nb");         # 0 => a␤2 => b␤
 .say for paragraphs($path.IO.lines);   # …
@@ -72,14 +70,18 @@ my $string = "foo";
 my $regex  = regexify($string, :ignorecase);
 say "FOOBAR" ~~ $regex;                # ｢FOO｣
 
-dd expand-tab("a\tbb\tccc",4);         # "a   bb  ccc"
+say root <abcd abce abde>;             # ab
 
-say word-at("foo bar baz", 5);         # (4 3)
+say sha1("foo bar baz";                # C7567E8B39E...
 
-say abbrev(<yes no>).keys.sort;        # (n no y ye yes)
+say stem "foo.tar.gz";                 # foo
+say stem "foo.tar.gz", 1;              # foo.tar
+
+dd trailing-whitespace("bar \t ");     # " \t "
+
+say word-at("foo bar baz", 5);         # (4 3 1)
 
 use String::Utils <before after>;  # only import "before" and "after"
-
 =end code
 
 =head1 DESCRIPTION
@@ -92,9 +94,7 @@ These functions are implemented B<without> using regexes for speed.
 =head1 SELECTIVE IMPORTING
 
 =begin code :lang<raku>
-
 use String::Utils <before after>;  # only import "before" and "after"
-
 =end code
 
 By default all utility functions are exported.  But you can limit this to
@@ -108,40 +108,59 @@ is known in this distribution, followed by the name with which it will be
 known in the lexical context in which the C<use> command is executed.
 
 =begin code :lang<raku>
-
 use String::Utils <root:common-start>;  # import "root" as "common-start"
 
 say common-start <abcd abce abde>;  # ab
-
 =end code
 
 =head1 SUBROUTINES
 
+=head2 abbrev
+
+=begin code :lang<raku>
+say abbrev(<yes no>).keys.sort;       # (n no y ye yes)
+
+say abbrev(<foo bar baz>).keys.sort;  # (bar baz f fo foo)
+=end code
+
+Takes 0 or more strings as arguments, and returns a C<Map> with all
+shortest possible unambigious versions of the given strings as keys,
+and their associated original string as the value.
+
+Inspired by Text::Abbrev module by KamilaBorowska.
+
 =head2 after
 
 =begin code :lang<raku>
-
 say after("foobar","foo");   # bar
 
 say "foobar".&after("foo");  # bar
 
 say after("foobar","goo");   # Nil
-
 =end code
 
 Return the string B<after> a given string, or C<Nil> if the given string could
 not be found.  The equivalent of the stringification of C</ <?after foo> .* />.
 
+=head2 all-same
+
+=begin code :lang<raku>
+say all-same("aaaaaa");                # "a"
+say all-same("aaaaba");                # Nil
+say all-same("");                      # Nil
+=end code
+
+If the given string consists of a single character, returns that
+character.  Else returns C<Nil>.
+
 =head2 around
 
 =begin code :lang<raku>
-
 say around("foobarbaz","ob","rb");     # foaz
 
 say "foobarbaz".&around("ob","rb");    # foaz
 
 say around("foobarbaz","goo","baz");   # foobarbaz
-
 =end code
 
 Return the string B<around> two given strings, or the string itself if either
@@ -151,13 +170,11 @@ C<.subst: / <?after ob> .*? <?before rb> />.
 =head2 before
 
 =begin code :lang<raku>
-
 say before("foobar","bar");   # foo
 
 say "foobar".&before("bar");  # foo
 
 say before("foobar","baz");   # Nil
-
 =end code
 
 Return the string B<before> a given string, or C<Nil> if the given string could
@@ -167,13 +184,11 @@ C</ .*? <?before bar> />.
 =head2 between
 
 =begin code :lang<raku>
-
 say between("foobarbaz","foo","baz");   # bar
 
 say "foobarbaz".&between("foo","baz");  # bar
 
 say between("foobarbaz","goo","baz");   # Nil
-
 =end code
 
 Return the string B<between> two given strings, or C<Nil> if either of the
@@ -183,13 +198,11 @@ C</ <?after foo> .*? <?before baz> />.
 =head2 between-included
 
 =begin code :lang<raku>
-
 say between-included("foobarbaz","oo","baz");   # oobarbaz
 
 say "foobarbaz".&between-included("oo","baz");  # oobarbaz
 
 say between-included("foobarbaz","goo","baz");  # Nil
-
 =end code
 
 Return the string B<between> two given strings B<including> the given strings,
@@ -199,76 +212,130 @@ of the stringification of C</ o .*? baz />.
 =head2 chomp-needle
 
 =begin code :lang<raku>
-
 say chomp-needle("foobarbaz","baz");   # foobar
 
 say "foobarbaz".&chomp-needle("baz");  # foobar
 
 say chomp-needle("foobarbaz","bar");   # foobarbaz
-
 =end code
 
 Return the string without the given target string at the end, or the string
 itself if the target string is not at the end.  The equivalent of
 C<.subst(/ baz $/)>.
 
-=head2 root
+=head2 consists-of
 
 =begin code :lang<raku>
-
-say root <abcd abce abde>;  # ab
-
+say consists-of("aaabbcc", "abc");     # True
+say consists-of("aaadbcc", "abc");     # False
+say consists-of("", "abc");            # True
 =end code
 
-Return the common B<beginning> of the given strings, or the empty string if
-no common string could be found.  See also C<leaf>.
+Returns a C<Bool> indicating whether the string given as the first
+positional argument only consists of characters given as the second
+positional argument, or is empty.
 
-=head2 leaf
+=head2 expand-tab
 
 =begin code :lang<raku>
-
-say leaf <zip.txt zop.txt ff.txt>;  # .txt
-
+dd expand-tab("a\tbb\tccc",4);  # "a   bb  ccc"
 =end code
 
-Return the common B<end> of the given strings, or the empty string if no
-common string could be found.  See also C<root>.
+Expand any tabs in a string (the first argument) to the given tab
+width (the second argument).  If there are no tabs, then the given
+string will be returned unaltered.
+
+If the tab width is B<zero> or B<negative>, will remove any tabs
+from the string.  If the tab width is B<one>, then all tabs will
+be replaced by spaces.
+
+=head2 has-marks
+
+=begin code :lang<raku>
+say has-marks("foo👩🏽‍💻bar");             # False
+say has-marks("fóöbar");               # True
+=end code
+
+Returns a C<Bool> indicating whether the given string contains any
+alphanumeric characters with marks (accents).
+
+=head2 is-lowercase
+
+=begin code :lang<raku>
+say is-lowercase("foobar");  # True
+say is-lowercase("FooBar");  # False
+say is-lowercase("");        # True
+=end code
+
+Returns a C<Bool> indicating whether the string consists of just
+lowercase characters, or is empty.
 
 =head2 is-sha1
 
 =begin code :lang<raku>
-
 say is-sha1 "abcd abce abde";  # False
 say is-sha1 "356A192B7913B04C54574D18C28D46E6395428AB";  # True
-
 =end code
 
 Return a C<Bool> indicating whether the given string is a SHA1 string
 (40 chars and only containing 0123456789ABCDEF).
 
-=head2 stem
+=head2 is-uppercase
 
 =begin code :lang<raku>
-
-say stem "foo.tar.gz";     # foo
-say stem "foo.tar.gz", 1;  # foo.tar
-say stem "foo.tar.gz", *;  # foo
-
+say is-uppercase("FOOBAR");  # True
+say is-uppercase("FooBar");  # False
+say is-uppercase("");        # True
 =end code
 
-Return the stem of a string with all of its extensions removed.
-Optionally accepts a second argument indicating the number of extensions
-to be removed.  This may be C<*> (aka C<Whatever>) to indicate to
-remove all extensions.
+Returns a C<Bool> indicating whether the string consists of just
+uppercase characters, or is empty.
+
+=head2 is-whitespace
+
+=begin code :lang<raku>
+say is-whitespace("\t \n");  # True
+say is-whitespace("\ta\n");  # False
+say is-whitespace("");       # True
+=end code
+
+Returns a C<Bool> indicating whether the string consists of just
+whitespace characters, or is empty.
+
+=head2 leading-whitespace
+
+=begin code :lang<raku>
+dd leading-whitespace("foo");      # ""
+dd leading-whitespace(" \t foo");  # " \t "
+dd leading-whitespace(" \t ");     # " \t "
+=end code
+
+Returns a C<Str> containing any leading whitespace of the given string.
+
+=head2 leaf
+
+=begin code :lang<raku>
+say leaf <zip.txt zop.txt ff.txt>;  # .txt
+=end code
+
+Return the common B<end> of the given strings, or the empty string if no
+common string could be found.  See also C<root>.
+
+=head2 letters
+
+=begin code :lang<raku>
+say letters("//foo:bar");  # foobar
+=end code
+
+Returns all of the alphanumeric characters in the given string as a
+string.
 
 =head2 ngram
 
 =begin code :lang<raku>
-
 say ngram "foobar", 3;            # foo oob oba bar
 
 say ngram "foobar", 4, :partial;  # foob ooba obar bar ar r
-
 =end code
 
 Return a sequence of substrings of the given size, while only moving up
@@ -276,150 +343,31 @@ one position at a time in the original string.  Optionally takes a
 C<:partial> flag to also produce incomplete substrings at the end of
 the sequence.
 
+=head2 nomark
+
+=begin code :lang<raku>
+say nomark("élève");  # eleve
+=end code
+
+Returns the given string with any diacritcs removed.
+
 =head2 non-word
 
 =begin code :lang<raku>
-
 say non-word "foobar";   # False
 
 say non-word "foo/bar";  # True
-
 =end code
 
 Returns a C<Bool> indicating whether the string contained B<any>
 non-word characters.
 
-=head2 letters
-
-=begin code :lang<raku>
-
-say letters("//foo:bar");  # foobar
-
-=end code
-
-Returns all of the alphanumeric characters in the given string as a
-string.
-
-=head2 nomark
-
-=begin code :lang<raku>
-
-say nomark("élève");  # eleve
-
-=end code
-
-Returns the given string with any diacritcs removed.
-
-=head2 has-marks
-
-=begin code :lang<raku>
-
-say has-marks("foo👩🏽‍💻bar");             # False
-say has-marks("fóöbar");               # True
-
-=end code
-
-Returns a C<Bool> indicating whether the given string contains any
-alphanumeric characters with marks (accents).
-
-=head2 leading-whitespace
-
-=begin code :lang<raku>
-
-dd leading-whitespace("foo");      # ""
-dd leading-whitespace(" \t foo");  # " \t "
-dd leading-whitespace(" \t ");     # " \t "
-
-=end code
-
-Returns a C<Str> containing any leading whitespace of the given string.
-
-=head2 trailing-whitespace
-
-=begin code :lang<raku>
-
-dd trailing-whitespace("bar");      # ""
-dd trailing-whitespace("bar \t ");  # " \t "
-dd trailing-whitespace(" \t ");     # " \t "
-
-=end code
-
-Returns a C<Str> containing any trailing whitespace of the given string.
-
-=head2 is-whitespace
-
-=begin code :lang<raku>
-
-say is-whitespace("\t \n");  # True
-say is-whitespace("\ta\n");  # False
-say is-whitespace("");       # True
-
-=end code
-
-Returns a C<Bool> indicating whether the string consists of just
-whitespace characters, or is empty.
-
-=head2 is-uppercase
-
-=begin code :lang<raku>
-
-say is-uppercase("FOOBAR");  # True
-say is-uppercase("FooBar");  # False
-say is-uppercase("");        # True
-
-=end code
-
-Returns a C<Bool> indicating whether the string consists of just
-uppercase characters, or is empty.
-
-=head2 is-lowercase
-
-=begin code :lang<raku>
-
-say is-lowercase("foobar");  # True
-say is-lowercase("FooBar");  # False
-say is-lowercase("");        # True
-
-=end code
-
-Returns a C<Bool> indicating whether the string consists of just
-lowercase characters, or is empty.
-
-=head2 consists-of
-
-=begin code :lang<raku>
-
-say consists-of("aaabbcc", "abc");     # True
-say consists-of("aaadbcc", "abc");     # False
-say consists-of("", "abc");            # True
-
-=end code
-
-Returns a C<Bool> indicating whether the string given as the first
-positional argument only consists of characters given as the second
-positional argument, or is empty.
-
-=head2 all-same
-
-=begin code :lang<raku>
-
-say all-same("aaaaaa");                # "a"
-say all-same("aaaaba");                # Nil
-say all-same("");                      # Nil
-
-=end code
-
-If the given string consists of a single character, returns that
-character.  Else returns C<Nil>.
-
 =head2 paragraphs
 
 =begin code :lang<raku>
-
 .say for paragraphs($path.IO.lines);   # …
 .say for paragraphs("a\n\nb");         # 0 => a␤2 => b␤
 .say for paragraphs("a\n\nb", 1);      # 1 => a␤3 => b␤
-
 =end code
 
 Lazily produces a C<Seq> of C<Pairs> with paragraphs from a C<Seq> or
@@ -430,10 +378,8 @@ The optional second argument can be used to indicate the ordinal number
 of the first line in the string.
 
 =begin code :lang<raku>
-
 my class A is Pair { }
 .say for paragraphs("a\n\nb", 1, :Pair(A));  # 1 => a␤␤3 => b␤
-
 =end code
 
 Also takes an optional named argument C<:Pair> that indicates the class
@@ -443,11 +389,9 @@ C<Pair> class.
 =head2 regexify
 
 =begin code :lang<raku>
-
 my $string = "foo";
 my $regex  = regexify($string, :ignorecase);
 say "FOOBAR" ~~ $regex;  # ｢FOO｣
-
 =end code
 
 Produce a C<Regex> object from a given string and modifiers.  Note that this
@@ -460,10 +404,8 @@ The following modifiers are supported:
 =head3 i / ignorecase
 
 =begin code :lang<raku>
-
 # accept haystack if "bar" is found, regardless of case
 my $regex = regexify("bar", :i);  # or :ignorecase
-
 =end code
 
 Allow characters to match even if they are of mixed case.
@@ -471,13 +413,11 @@ Allow characters to match even if they are of mixed case.
 =head3 smartcase
 
 =begin code :lang<raku>
-
 # accept haystack if "bar" is found, regardless of case
 my &anycase = regexify("bar", :smartcase);
 
 # accept haystack if "Bar" is found
 my &exactcase = regexify("Bar", :smartcase);
-
 =end code
 
 If the needle is a string and does B<not> contain any uppercase
@@ -486,10 +426,8 @@ characters, then C<ignorecase> semantics will be assumed.
 =head3 m / ignoremark
 
 =begin code :lang<raku>
-
 # accept haystack if "bar" is found, regardless of any accents
 my &anycase = regexify("bar", :m);  # or :ignoremark
-
 =end code
 
 Allow characters to match even if they have accents (or not).
@@ -497,40 +435,62 @@ Allow characters to match even if they have accents (or not).
 =head3 smartmark
 
 =begin code :lang<raku>
-
 # accept haystack if "bar" is found, regardless of any accents
 my &anymark = regexify("bar", :smartmark);
 
 # accept haystack if "bår" is found
 my &exactmark = regexify("bår", :smartmark);
-
 =end code
 
 If the needle is a string and does B<not> contain any characters with
 accents, then C<ignoremark> semantics will be assumed.
 
-=head2 expand-tab
+=head2 root
 
 =begin code :lang<raku>
-
-dd expand-tab("a\tbb\tccc",4);  # "a   bb  ccc"
-
+say root <abcd abce abde>;  # ab
 =end code
 
-Expand any tabs in a string (the first argument) to the given tab
-width (the second argument).  If there are no tabs, then the given
-string will be returned unaltered.
+Return the common B<beginning> of the given strings, or the empty string if
+no common string could be found.  See also C<leaf>.
 
-If the tab width is B<zero> or B<negative>, will remove any tabs
-from the string.  If the tab width is B<one>, then all tabs will
-be replaced by spaces.
+=head2 sha1
+
+=begin code :lang<raku>
+say sha1("foo bar baz";  # C7567E8B39E2428E38BF9C9226AC68DE4C67DC39
+=end code
+
+Returns a L<C<SHA1>|https://en.wikipedia.org/wiki/SHA-1> of the given
+string.  It should only be used for simple identification uses, as it
+can no longer reliably serve in any cryptographic use.
+
+=head2 stem
+
+=begin code :lang<raku>
+say stem "foo.tar.gz";     # foo
+say stem "foo.tar.gz", 1;  # foo.tar
+say stem "foo.tar.gz", *;  # foo
+=end code
+
+Return the stem of a string with all of its extensions removed.
+Optionally accepts a second argument indicating the number of extensions
+to be removed.  This may be C<*> (aka C<Whatever>) to indicate to
+remove all extensions.
+
+=head2 trailing-whitespace
+
+=begin code :lang<raku>
+dd trailing-whitespace("bar");      # ""
+dd trailing-whitespace("bar \t ");  # " \t "
+dd trailing-whitespace(" \t ");     # " \t "
+=end code
+
+Returns a C<Str> containing any trailing whitespace of the given string.
 
 =head2 word-at
 
 =begin code :lang<raku>
-
 say word-at("foo bar baz", 5);  # (4 3 1)
-
 =end code
 
 Returns a C<List> with the start position, the number of characters of
@@ -539,22 +499,6 @@ at the given position, or directly before it (using C<.words> semantics).
 
 Returns C<Empty> if no word could be found at the given position, or the
 position was out of range.
-
-=head2 abbrev
-
-=begin code :lang<raku>
-
-say abbrev(<yes no>).keys.sort;       # (n no y ye yes)
-
-say abbrev(<foo bar baz>).keys.sort;  # (bar baz f fo foo)
-
-=end code
-
-Takes 0 or more strings as arguments, and returns a C<Map> with all
-shortest possible unambigious versions of the given strings as keys,
-and their associated original string as the value.
-
-Inspired by Text::Abbrev module by KamilaBorowska.
 
 =head1 AUTHOR
 
@@ -569,7 +513,7 @@ deal to me!
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2022, 2023, 2024 Elizabeth Mattijsen
+Copyright 2022, 2023, 2024, 2025 Elizabeth Mattijsen
 
 This library is free software; you can redistribute it and/or modify it under the Artistic License 2.0.
 

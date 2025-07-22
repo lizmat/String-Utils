@@ -1,7 +1,7 @@
 use Test;
 use String::Utils;
 
-plan 111;
+plan 112;
 
 is after("foobar","foo"),       "bar", 'after(foo) ok?';
 is "foobar".&after("foo"),      "bar", '.&after(foo) ok?';
@@ -50,6 +50,8 @@ is-deeply (is-sha1 "356A192B7913B04C54574D18C28D46E6395428A"), False,
   'is SHA1 not ok (2)';
 is-deeply (is-sha1 "356A192B7913B04C54574D18C28D46E6395428ABC"), False,
   'is SHA1 not ok (3)';
+is-deeply (is-sha1(sha1 "foo bar baz")), True,
+  'does sha1 produce a valid SHA1';
 
 is-deeply stem("foo.tar.gz"), 'foo', 'stem without number of extensions';
 is-deeply stem("foo.tar.gz", 1), 'foo.tar', 'stem, 1 extension removed';

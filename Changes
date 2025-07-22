@@ -1,6 +1,9 @@
 Revision history for String-Utils
 
 {{$NEXT}}
+    - Added support for "sha1", as we also have "is-sha1"
+    - Order documentation of subs alphabetically
+    - Update copyright year
 
 0.0.32  2024-12-16T17:13:30+01:00
     - Add support for "abbrev", inspired by Text::Abbrev by
