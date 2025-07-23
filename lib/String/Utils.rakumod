@@ -5,6 +5,93 @@
 # that are not based on NQP.
 use nqp;
 
+#- helper subs -----------------------------------------------------------------
+my sub is-CCLASS(str $string, int $type) {
+    nqp::hllbool(
+      nqp::iseq_i(
+        nqp::findnotcclass($type,$string,0,nqp::chars($string)),
+        nqp::chars($string)
+      )
+    )
+}
+
+#- abbrev ----------------------------------------------------------------------
+my proto sub abbrev(|) {*}
+my multi sub abbrev() { BEGIN Map.new }
+my multi sub abbrev(*@words) { abbrev(@words) }
+my multi sub abbrev(@words) {
+    my $result := Map.new;
+    my $seen   := nqp::getattr($result,Map,'$!storage');
+    for @words -> str $word {
+        nqp::bindkey($seen,$word,$word);
+
+        my int $chars = nqp::chars($word);
+        nqp::while(
+          --$chars > 0,
+          nqp::stmts(
+            (my str $needle = nqp::substr($word,0,$chars)),
+            nqp::if(
+              nqp::existskey($seen,$needle),
+              nqp::stmts(
+                nqp::deletekey($seen,$needle),
+                nqp::while(
+                  --$chars,
+                  nqp::deletekey($seen,nqp::substr($word,0,$chars))
+                )
+              ),
+              nqp::bindkey($seen,$needle,$word)
+            )
+          )
+        );
+    }
+
+    $result
+}
+
+#- after -----------------------------------------------------------------------
+my sub after(str $string, str $after) {
+    nqp::iseq_i((my int $right = nqp::index($string,$after)),-1)
+      ?? Nil
+      !! nqp::substr($string,nqp::add_i($right,nqp::chars($after)))
+}
+
+#- all-same --------------------------------------------------------------------
+my sub all-same(str $string) {
+    nqp::chars($string)
+      && consists-of($string, nqp::substr($string,0,1))
+      ?? nqp::substr($string,0,1)
+      !! Nil
+}
+
+#- around ----------------------------------------------------------------------
+my sub around(str $string, str $before, str $after) {
+    nqp::if(
+      nqp::iseq_i((my int $left = nqp::index($string,$before)),-1),
+      $string,
+      nqp::if(
+        nqp::iseq_i(
+          (my int $right = nqp::index(
+            $string,$after,nqp::add_i($left,nqp::chars($before))
+          )),
+          -1
+        ),
+        $string,
+        nqp::concat(
+          nqp::substr($string,0,$left),
+          nqp::substr($string,nqp::add_i($right,nqp::chars($after)))
+        )
+      )
+    )
+}
+
+#- before ----------------------------------------------------------------------
+my sub before(str $string, str $before) {
+    nqp::iseq_i((my int $left = nqp::index($string,$before)),-1)
+      ?? Nil
+      !! nqp::substr($string,0,$left)
+}
+
+#- between ---------------------------------------------------------------------
 my sub between(str $string, str $before, str $after) {
     nqp::if(
       nqp::iseq_i((my int $left = nqp::index($string,$before)),-1),
@@ -22,6 +109,7 @@ my sub between(str $string, str $before, str $after) {
     )
 }
 
+#- between-included ------------------------------------------------------------
 my sub between-included(str $string, str $before, str $after) {
     nqp::if(
       nqp::iseq_i((my int $left = nqp::index($string,$before)),-1),
@@ -43,69 +131,125 @@ my sub between-included(str $string, str $before, str $after) {
     )
 }
 
-my sub around(str $string, str $before, str $after) {
-    nqp::if(
-      nqp::iseq_i((my int $left = nqp::index($string,$before)),-1),
-      $string,
-      nqp::if(
-        nqp::iseq_i(
-          (my int $right = nqp::index(
-            $string,$after,nqp::add_i($left,nqp::chars($before))
-          )),
-          -1
-        ),
-        $string,
-        nqp::concat(
-          nqp::substr($string,0,$left),
-          nqp::substr($string,nqp::add_i($right,nqp::chars($after)))
-        )
-      )
-    )
+#- chomp-needle ----------------------------------------------------------------
+my sub chomp-needle(str $haystack, str $needle) {
+    my int $offset = nqp::sub_i(nqp::chars($haystack),nqp::chars($needle));
+    nqp::eqat($haystack,$needle,$offset)
+      ?? nqp::substr($haystack,0,$offset)
+      !! $haystack
 }
 
-my sub before(str $string, str $before) {
-    nqp::iseq_i((my int $left = nqp::index($string,$before)),-1)
-      ?? Nil
-      !! nqp::substr($string,0,$left)
+#- consists-of -----------------------------------------------------------------
+my sub consists-of(str $string, str $chars) {
+    my int32 @codes;
+    my int8  @ok;
+
+    nqp::strtocodes($string,nqp::const::NORMALIZE_NFC,@codes);
+    @ok[.ord] = 1 for $chars.comb;
+
+    my int $i     = -1;
+    my int $elems = nqp::elems(@codes);
+    nqp::while(
+      nqp::islt_i(++$i,$elems)
+        && nqp::atpos_i(@ok,nqp::atpos_i(@codes,$i)),
+      nqp::null
+    );
+
+    nqp::hllbool(nqp::iseq_i($i,$elems))
 }
 
-my sub after(str $string, str $after) {
-    nqp::iseq_i((my int $right = nqp::index($string,$after)),-1)
-      ?? Nil
-      !! nqp::substr($string,nqp::add_i($right,nqp::chars($after)))
+#- expand-tab ------------------------------------------------------------------
+my sub expand-tab(str $spec, int $size) {
+    my str @parts = nqp::split("\t",$spec);
+
+    # need to do something
+    if nqp::elems(@parts) > 1 {
+
+        # just remove tabs
+        if $size <= 0 {
+            nqp::join("",@parts)
+        }
+
+        # just replace tab by space
+        elsif $size == 1 {
+            nqp::join(" ",@parts)
+        }
+
+        # need to calculate columns
+        else {
+            my int $end = nqp::elems(@parts) - 1;
+            my int $width;
+            my int $i = -1;
+            nqp::while(
+              nqp::islt_i(++$i,$end),
+              nqp::stmts(
+                (my str $part = nqp::atpos_s(@parts,$i)),
+                ($width = $width + nqp::chars($part)),
+                (my int $add = $size - nqp::mod_i($width,$size)),
+                nqp::bindpos_s(@parts,$i,nqp::concat($part,nqp::x(' ',$add))),
+                ($width = $width + $add)
+              )
+            );
+            nqp::join('',@parts)
+        }
+    }
+
+    # nothing to do
+    else {
+        $spec
+    }
 }
 
-my sub root(*@s) {
-    if @s > 1 {
-        my str $base = @s.shift.Str;
-        my $same := nqp::clone(nqp::strtocodes(  # MUST be a clone
-          $base,nqp::const::NORMALIZE_NFC,nqp::create(array[uint32])
-        ));
-        my int $elems = nqp::elems($same);
-        my $next := nqp::create(array[uint32]);
+#- has-marks -------------------------------------------------------------------
+my sub has-marks(str $string) {
+    my str $letters = letters($string);
+    nqp::strtocodes($letters, nqp::const::NORMALIZE_NFD, my int32 @ords);
+    nqp::hllbool(nqp::isne_i(nqp::chars($letters),nqp::elems(@ords)))
+}
+
+#- is-lowercase ----------------------------------------------------------------
+my sub is-lowercase(str $string) {
+    is-CCLASS($string, nqp::const::CCLASS_LOWERCASE)
+}
+
+#- is-sha1 ---------------------------------------------------------------------
+my sub is-sha1(str $needle) {
+    my int $i;
+    if nqp::chars($needle) == 40 {
+        my $map := BEGIN {
+            my int @map;
+            @map[.ord] = 1 for "0123456789ABCDEF".comb;
+            @map;
+        }
 
         nqp::while(
-          $elems && @s,
-          nqp::stmts(
-            nqp::strtocodes(@s.shift.Str,nqp::const::NORMALIZE_NFC,$next),
-            (my int $i = -1),
-            nqp::while(
-              nqp::islt_i(++$i,$elems),
-              nqp::if(
-                nqp::isne_i(nqp::atpos_i($same,$i),nqp::atpos_i($next,$i)),
-                nqp::setelems($same, $elems = $i)
-              )
-            )
-          )
-        );
+          nqp::isle_i($i,40)
+            && nqp::atpos_i($map,nqp::ordat($needle,$i)),
+          ++$i
+        )
+    }
 
-        nqp::substr($base, 0, $elems)
-    }
-    else {
-        @s.head // ""
-    }
+    nqp::hllbool(nqp::iseq_i($i,41))
 }
 
+#- is-uppercase ----------------------------------------------------------------
+my sub is-uppercase(str $string) {
+    is-CCLASS($string, nqp::const::CCLASS_UPPERCASE)
+}
+
+#- is-whitespace ---------------------------------------------------------------
+my sub is-whitespace(str $string) {
+    is-CCLASS($string, nqp::const::CCLASS_WHITESPACE)
+}
+
+#- leading-whitespace ----------------------------------------------------------
+my sub leading-whitespace(str $string) {
+    nqp::substr($string,0,nqp::findnotcclass(
+      nqp::const::CCLASS_WHITESPACE,$string,0,nqp::chars($string)
+    ))
+}
+
+#- leaf ------------------------------------------------------------------------
 my sub leaf(*@s) {
     if @s > 1 {
         my str $base = nqp::flip(@s.shift.Str);
@@ -139,47 +283,36 @@ my sub leaf(*@s) {
     }
 }
 
-my sub chomp-needle(str $haystack, str $needle) {
-    my int $offset = nqp::sub_i(nqp::chars($haystack),nqp::chars($needle));
-    nqp::eqat($haystack,$needle,$offset)
-      ?? nqp::substr($haystack,0,$offset)
-      !! $haystack
-}
-
-my sub sha1(str $needle) { nqp::sha1($needle) }
-
-my sub is-sha1(str $needle) {
-    my int $i;
-    if nqp::chars($needle) == 40 {
-        my $map := BEGIN {
-            my int @map;
-            @map[.ord] = 1 for "0123456789ABCDEF".comb;
-            @map;
-        }
-
-        nqp::while(
-          nqp::isle_i($i,40)
-            && nqp::atpos_i($map,nqp::ordat($needle,$i)),
-          ++$i
+#- letters ---------------------------------------------------------------------
+my sub letters(str $string) {
+    my $found := nqp::list_s;
+    my int $start;
+    my int $end;
+    my int $chars = nqp::chars($string);
+    nqp::until(
+      nqp::iseq_i($start,$chars),
+      nqp::stmts(
+        ($end = nqp::findnotcclass(
+          nqp::const::CCLASS_WORD,$string,$start,$chars
+        )),
+        nqp::if(
+          nqp::isgt_i($end,$start),
+          nqp::push_s($found,nqp::substr($string,$start,$end - $start))
+        ),
+        nqp::if(
+          nqp::iseq_i($end,$chars),
+          ($start = $end),
+          ($start = nqp::findcclass(
+            nqp::const::CCLASS_WORD,$string,$end,$chars
+          ))
         )
-    }
-
-    nqp::hllbool(nqp::iseq_i($i,41))
+      )
+    );
+    nqp::join('',$found)
 }
 
-my sub stem(str $basename, $parts = *) {
-    (my @indices := indices($basename, '.'))
-      ?? nqp::substr(
-           $basename,
-           0,
-           nqp::istype($parts,Whatever) || $parts > @indices
-            ?? @indices[0]
-            !! @indices[@indices - $parts]
-         )
-      !! $basename
-}
-
-# This is a copy of Rakudo::Iterator::NGrams from tyhe Rakudo
+#- ngram -----------------------------------------------------------------------
+# This is a copy of Rakudo::Iterator::NGrams from the Rakudo
 # core from 2022.10 onwards.
 my class NGrams does PredictiveIterator {
     has str $!str;
@@ -246,44 +379,7 @@ my sub ngram(str $string, Int:D $size, $limit = *, :$partial) {
       !! Seq.new: NGrams.new: $string, $size, $limit, 1, $partial
 }
 
-my sub non-word(str $string) {
-    nqp::hllbool(
-      nqp::islt_i(
-        nqp::findnotcclass(
-          nqp::const::CCLASS_WORD,$string,0,nqp::chars($string)
-        ),
-        nqp::chars($string)
-      )
-    )
-}
-
-my sub letters(str $string) {
-    my $found := nqp::list_s;
-    my int $start;
-    my int $end;
-    my int $chars = nqp::chars($string);
-    nqp::until(
-      nqp::iseq_i($start,$chars),
-      nqp::stmts(
-        ($end = nqp::findnotcclass(
-          nqp::const::CCLASS_WORD,$string,$start,$chars
-        )),
-        nqp::if(
-          nqp::isgt_i($end,$start),
-          nqp::push_s($found,nqp::substr($string,$start,$end - $start))
-        ),
-        nqp::if(
-          nqp::iseq_i($end,$chars),
-          ($start = $end),
-          ($start = nqp::findcclass(
-            nqp::const::CCLASS_WORD,$string,$end,$chars
-          ))
-        )
-      )
-    );
-    nqp::join('',$found)
-}
-
+#- nomark ----------------------------------------------------------------------
 my constant $gcprop = nqp::unipropcode("General_Category");
 my constant $empty  = nqp::create(array[uint32]);
 my sub nomark(str $string) {
@@ -333,70 +429,19 @@ my sub nomark(str $string) {
     }
 }
 
-my sub has-marks(str $string) {
-    my str $letters = letters($string);
-    nqp::strtocodes($letters, nqp::const::NORMALIZE_NFD, my int32 @ords);
-    nqp::hllbool(nqp::isne_i(nqp::chars($letters),nqp::elems(@ords)))
-}
-
-my sub leading-whitespace(str $string) {
-    nqp::substr($string,0,nqp::findnotcclass(
-      nqp::const::CCLASS_WHITESPACE,$string,0,nqp::chars($string)
-    ))
-}
-
-my sub trailing-whitespace(str $string) {
-    nqp::substr($string,nqp::chars($string) - nqp::findnotcclass(
-      nqp::const::CCLASS_WHITESPACE,nqp::flip($string),0,nqp::chars($string)
-    ))
-}
-
-my sub is-CCLASS(str $string, int $type) {
+#- non-word --------------------------------------------------------------------
+my sub non-word(str $string) {
     nqp::hllbool(
-      nqp::iseq_i(
-        nqp::findnotcclass($type,$string,0,nqp::chars($string)),
+      nqp::islt_i(
+        nqp::findnotcclass(
+          nqp::const::CCLASS_WORD,$string,0,nqp::chars($string)
+        ),
         nqp::chars($string)
       )
     )
 }
 
-my sub is-whitespace(str $string) {
-    is-CCLASS($string, nqp::const::CCLASS_WHITESPACE)
-}
-
-my sub is-uppercase(str $string) {
-    is-CCLASS($string, nqp::const::CCLASS_UPPERCASE)
-}
-
-my sub is-lowercase(str $string) {
-    is-CCLASS($string, nqp::const::CCLASS_LOWERCASE)
-}
-
-my sub consists-of(str $string, str $chars) {
-    my int32 @codes;
-    my int8  @ok;
-
-    nqp::strtocodes($string,nqp::const::NORMALIZE_NFC,@codes);
-    @ok[.ord] = 1 for $chars.comb;
-
-    my int $i     = -1;
-    my int $elems = nqp::elems(@codes);
-    nqp::while(
-      nqp::islt_i(++$i,$elems)
-        && nqp::atpos_i(@ok,nqp::atpos_i(@codes,$i)),
-      nqp::null
-    );
-
-    nqp::hllbool(nqp::iseq_i($i,$elems))
-}
-
-my sub all-same(str $string) {
-    nqp::chars($string)
-      && consists-of($string, nqp::substr($string,0,1))
-      ?? nqp::substr($string,0,1)
-      !! Nil
-}
-
+#- paragraphs ------------------------------------------------------------------
 my proto sub paragraphs(|) {*}
 my multi sub paragraphs(@source, Int:D $initial = 0, :$Pair = Pair) {
     my class Paragraphs does Iterator {
@@ -486,6 +531,7 @@ my multi sub paragraphs(Cool:D $string, Int:D $initial = 0, :$Pair = Pair) {
     paragraphs $string.Str.lines, $initial, :$Pair
 }
 
+#- regexify --------------------------------------------------------------------
 my sub regexify(str $spec, *%_) {
     my str $i = %_<i>
       || %_<ignorecase>
@@ -501,47 +547,62 @@ my sub regexify(str $spec, *%_) {
     "/$i$m$spec/".EVAL  # until there's a better solution
 }
 
-my sub expand-tab(str $spec, int $size) {
-    my str @parts = nqp::split("\t",$spec);
+#- root ------------------------------------------------------------------------
+my sub root(*@s) {
+    if @s > 1 {
+        my str $base = @s.shift.Str;
+        my $same := nqp::clone(nqp::strtocodes(  # MUST be a clone
+          $base,nqp::const::NORMALIZE_NFC,nqp::create(array[uint32])
+        ));
+        my int $elems = nqp::elems($same);
+        my $next := nqp::create(array[uint32]);
 
-    # need to do something
-    if nqp::elems(@parts) > 1 {
-
-        # just remove tabs
-        if $size <= 0 {
-            nqp::join("",@parts)
-        }
-
-        # just replace tab by space
-        elsif $size == 1 {
-            nqp::join(" ",@parts)
-        }
-
-        # need to calculate columns
-        else {
-            my int $end = nqp::elems(@parts) - 1;
-            my int $width;
-            my int $i = -1;
+        nqp::while(
+          $elems && @s,
+          nqp::stmts(
+            nqp::strtocodes(@s.shift.Str,nqp::const::NORMALIZE_NFC,$next),
+            (my int $i = -1),
             nqp::while(
-              nqp::islt_i(++$i,$end),
-              nqp::stmts(
-                (my str $part = nqp::atpos_s(@parts,$i)),
-                ($width = $width + nqp::chars($part)),
-                (my int $add = $size - nqp::mod_i($width,$size)),
-                nqp::bindpos_s(@parts,$i,nqp::concat($part,nqp::x(' ',$add))),
-                ($width = $width + $add)
+              nqp::islt_i(++$i,$elems),
+              nqp::if(
+                nqp::isne_i(nqp::atpos_i($same,$i),nqp::atpos_i($next,$i)),
+                nqp::setelems($same, $elems = $i)
               )
-            );
-            nqp::join('',@parts)
-        }
-    }
+            )
+          )
+        );
 
-    # nothing to do
+        nqp::substr($base, 0, $elems)
+    }
     else {
-        $spec
+        @s.head // ""
     }
 }
 
+#- sha1 ------------------------------------------------------------------------
+my sub sha1(str $needle) { nqp::sha1($needle) }
+
+#- stem ------------------------------------------------------------------------
+my sub stem(str $basename, $parts = *) {
+    (my @indices := indices($basename, '.'))
+      ?? nqp::substr(
+           $basename,
+           0,
+           nqp::istype($parts,Whatever) || $parts > @indices
+            ?? @indices[0]
+            !! @indices[@indices - $parts]
+         )
+      !! $basename
+}
+
+#- trailing-whitespace ---------------------------------------------------------
+my sub trailing-whitespace(str $string) {
+    nqp::substr($string,nqp::chars($string) - nqp::findnotcclass(
+      nqp::const::CCLASS_WHITESPACE,nqp::flip($string),0,nqp::chars($string)
+    ))
+}
+
+#- word-at ---------------------------------------------------------------------
 my sub word-at(str $string, int $cursor) {
 
     # something to look at
@@ -572,38 +633,7 @@ my sub word-at(str $string, int $cursor) {
     }
 }
 
-my proto sub abbrev(|) {*}
-my multi sub abbrev() { BEGIN Map.new }
-my multi sub abbrev(*@words) { abbrev(@words) }
-my multi sub abbrev(@words) {
-    my $result := Map.new;
-    my $seen   := nqp::getattr($result,Map,'$!storage');
-    for @words -> str $word {
-        nqp::bindkey($seen,$word,$word);
-
-        my int $chars = nqp::chars($word);
-        nqp::while(
-          --$chars > 0,
-          nqp::stmts(
-            (my str $needle = nqp::substr($word,0,$chars)),
-            nqp::if(
-              nqp::existskey($seen,$needle),
-              nqp::stmts(
-                nqp::deletekey($seen,$needle),
-                nqp::while(
-                  --$chars,
-                  nqp::deletekey($seen,nqp::substr($word,0,$chars))
-                )
-              ),
-              nqp::bindkey($seen,$needle,$word)
-            )
-          )
-        );
-    }
-
-    $result
-}
-
+#- EXPORT ----------------------------------------------------------------------
 my sub EXPORT(*@names) {
     Map.new: @names
       ?? @names.map: {
@@ -621,5 +651,9 @@ my sub EXPORT(*@names) {
              .key.starts-with('&') && !(.key eq '&EXPORT' | '&is-CCLASS')
          }
 }
+
+#- hack ------------------------------------------------------------------------
+# To allow version / auth / api fetching
+module String::Utils:ver<0.0.33>:auth<zef:lizmat> { }
 
 # vim: expandtab shiftwidth=4

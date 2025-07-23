@@ -1,7 +1,7 @@
 use Test;
 use String::Utils;
 
-plan 112;
+plan 115;
 
 is after("foobar","foo"),       "bar", 'after(foo) ok?';
 is "foobar".&after("foo"),      "bar", '.&after(foo) ok?';
@@ -142,6 +142,10 @@ is-deeply abbrev(<yes no>), <n no no no y yes ye yes yes yes>.Map,
 is-deeply abbrev(<foo bar baz>), <bar bar baz baz f foo fo foo foo foo>.Map,
   "did foo/bar/baz abbreviate correctly";
 
-is paragraphs($*PROGRAM.lines).elems, 33, 'reading from file lazily';
+ok String::Utils.^ver,                'can we get a version from the module';
+is String::Utils.^auth, 'zef:lizmat', 'can we get an auth from the module';
+nok String::Utils.^api,               'can we get an api from the module';
+
+is paragraphs($*PROGRAM.lines).elems, 34, 'reading from file lazily';
 
 # vim: expandtab shiftwidth=4
