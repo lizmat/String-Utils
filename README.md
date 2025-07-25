@@ -79,6 +79,8 @@ say sha1("foo bar baz";                # C7567E8B39E...
 say stem "foo.tar.gz";                 # foo
 say stem "foo.tar.gz", 1;              # foo.tar
 
+say text-from-url $url, :verbose;      # ...
+
 dd trailing-whitespace("bar \t ");     # " \t "
 
 say word-at("foo bar baz", 5);         # (4 3 1)
@@ -453,6 +455,17 @@ say stem "foo.tar.gz", *;  # foo
 ```
 
 Return the stem of a string with all of its extensions removed. Optionally accepts a second argument indicating the number of extensions to be removed. This may be `*` (aka `Whatever`) to indicate to remove all extensions.
+
+text-from-url
+-------------
+
+```raku
+my $text = text-from-url $url, :verbose;
+```
+
+Returns the text found at the given URL, or `Nil` if the fetch of the text failed for some reason. Takes an optional `:verbose` named argument: if specified with a trueish value, will show any error output that was received on `STDERR`: defaults to False, to quietly just return `Nil` on error.
+
+Assumes the `curl` command-line program is installed and a network connection is available.
 
 trailing-whitespace
 -------------------

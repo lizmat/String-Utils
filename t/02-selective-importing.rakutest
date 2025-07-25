@@ -4,7 +4,8 @@ my constant @subs = <
   abbrev after all-same around before between between-included
   chomp-needle consists-of expand-tab has-marks is-lowercase is-sha1
   is-uppercase is-whitespace leading-whitespace leaf letters ngram
-  non-word regexify root sha1 stem trailing-whitespace word-at
+  non-word regexify root sha1 stem text-from-url trailing-whitespace
+  word-at
 >;
 
 plan @subs + 2;

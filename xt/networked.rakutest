@@ -1,0 +1,13 @@
+use Test;
+
+use String::Utils;
+
+plan 2;
+
+my $url := "https://360.zef.pm";
+
+ok text-from-url($url).chars >=  7480122, 'looks like a correct zef index';
+
+is-deeply text-from-url($url.chop), Nil, 'did we get a failure';
+
+# vim: expandtab shiftwidth=4

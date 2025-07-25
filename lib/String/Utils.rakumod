@@ -184,10 +184,10 @@ my sub expand-tab(str $spec, int $size) {
               nqp::islt_i(++$i,$end),
               nqp::stmts(
                 (my str $part = nqp::atpos_s(@parts,$i)),
-                ($width = $width + nqp::chars($part)),
-                (my int $add = $size - nqp::mod_i($width,$size)),
-                nqp::bindpos_s(@parts,$i,nqp::concat($part,nqp::x(' ',$add))),
-                ($width = $width + $add)
+                ($width = $width + nqp::chars($part)),  # UNCOVERABLE
+                (my int $add = $size - nqp::mod_i($width,$size)),  # UNCOVERABLE
+                nqp::bindpos_s(@parts,$i,nqp::concat($part,nqp::x(' ',$add))),  # UNCOVERABLE
+                ($width = $width + $add)  # UNCOVERABLE
               )
             );
             nqp::join('',@parts)
@@ -218,7 +218,7 @@ my sub is-sha1(str $needle) {
     if nqp::chars($needle) == 40 {
         my $map := BEGIN {
             my int @map;
-            @map[.ord] = 1 for "0123456789ABCDEF".comb;
+            @map[.ord] = 1 for "0123456789ABCDEF".comb;  # UNCOVERABLE
             @map;
         }
 
@@ -243,7 +243,7 @@ my sub is-whitespace(str $string) {
 }
 
 #- leading-whitespace ----------------------------------------------------------
-my sub leading-whitespace(str $string) {
+my sub leading-whitespace(str $string) {  # UNCOVERABLE
     nqp::substr($string,0,nqp::findnotcclass(
       nqp::const::CCLASS_WHITESPACE,$string,0,nqp::chars($string)
     ))
@@ -322,17 +322,17 @@ my class NGrams does PredictiveIterator {
     has int $!pos;
     has int $!todo;
     method !SET-SELF($string, $size, $limit, $step, $partial) {
-        $!str   = $string;
+        $!str   = $string;  # UNCOVERABLE
         $!what := $string.WHAT;
         $!size  = $size < 1 ?? 1 !! $size;
         $!step  = $step < 1 ?? 1 !! $step;
         $!pos   = -$step;
-        $!todo = (
+        $!todo = (  # UNCOVERABLE
           nqp::chars($!str) + $!step - ($partial ?? 1 !! $!size)
         ) div $!step;
         $!todo  = $limit
           unless nqp::istype($limit,Whatever) || $limit > $!todo;
-        $!todo  = $!todo + 1;
+        $!todo  = $!todo + 1;  # UNCOVERABLE
         self
     }
     method new($string, $size, $limit, $step, $partial) {
@@ -341,7 +341,7 @@ my class NGrams does PredictiveIterator {
           !! Rakudo::Iterator.Empty
     }
     method pull-one() {
-        --$!todo
+        --$!todo  # UNCOVERABLE
           ?? nqp::box_s(
                nqp::substr($!str,($!pos = $!pos + $!step),$!size),
                $!what
@@ -430,7 +430,7 @@ my sub nomark(str $string) {
 }
 
 #- non-word --------------------------------------------------------------------
-my sub non-word(str $string) {
+my sub non-word(str $string) {  # UNCOVERABLE
     nqp::hllbool(
       nqp::islt_i(
         nqp::findnotcclass(
@@ -475,8 +475,8 @@ my multi sub paragraphs(@source, Int:D $initial = 0, :$Pair = Pair) {
             }
 
             my sub paragraph(str $next) {
-               $!line = $line;
-               $!next = $next;
+               $!line = $line;  # UNCOVERABLE
+               $!next = $next;  # UNCOVERABLE
 
                $!Pair.new(
                   $line - nqp::elems($collected),
@@ -506,14 +506,14 @@ my multi sub paragraphs(@source, Int:D $initial = 0, :$Pair = Pair) {
 
             # Single line after last paraghraph
             if $!next {
-                $!iterator := nqp::null;
+                $!iterator := nqp::null;  # UNCOVERABLE
                 $!next
             }
 
             # Still need to produce final paragraph
-            elsif nqp::elems($collected) {
-                $!iterator := nqp::null;
-                ++$line;
+            elsif nqp::elems($collected) {  # UNCOVERABLE
+                $!iterator := nqp::null;  # UNCOVERABLE
+                ++$line;  # UNCOVERABLE
                 paragraph("")
             }
 
@@ -580,7 +580,7 @@ my sub root(*@s) {
 }
 
 #- sha1 ------------------------------------------------------------------------
-my sub sha1(str $needle) { nqp::sha1($needle) }
+my sub sha1(str $needle) { nqp::sha1($needle) }  # UNCOVERABLE
 
 #- stem ------------------------------------------------------------------------
 my sub stem(str $basename, $parts = *) {
@@ -593,6 +593,18 @@ my sub stem(str $basename, $parts = *) {
             !! @indices[@indices - $parts]
          )
       !! $basename
+}
+
+#- text-from-url ---------------------------------------------------------------
+my sub text-from-url(str $url, :$verbose) {
+    my $proc := run 'curl', '--fail', $url, :out, :err ;
+    if $proc.exitcode {
+        $*ERR.put: $proc.err.slurp if $verbose;
+        Nil
+    }
+    else {
+        $proc.out.slurp
+    }
 }
 
 #- trailing-whitespace ---------------------------------------------------------
@@ -619,7 +631,7 @@ my sub word-at(str $string, int $cursor) {
           )) < $cursor,
           nqp::stmts(
             nqp::if($pos > $last, ++$index),
-            ($last  = $pos + 1)
+            ($last  = $pos + 1)  # UNCOVERABLE
           )
         );
         $last >= $length || $pos == $last
