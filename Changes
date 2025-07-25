@@ -1,6 +1,8 @@
 Revision history for String-Utils
 
 {{$NEXT}}
+
+0.0.35  2025-07-25T11:56:18+02:00
     - Added support for "text-from-url"
     - Tightened up coverage testing to 96%
 
