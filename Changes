@@ -1,6 +1,8 @@
 Revision history for String-Utils
 
 {{$NEXT}}
+
+0.0.36  2025-08-08T12:02:10+02:00
     - Added support for "describe-Version"
     - Reached 100% coverage testing
 
