@@ -228,6 +228,16 @@ say consists-of("", "abc");            # True
 
 Returns a `Bool` indicating whether the string given as the first positional argument only consists of characters given as the second positional argument, or is empty.
 
+describe-Version
+----------------
+
+```raku
+say $*VM.version;                    # v2025.06.5.gb.1.c.74.b.8.d.8
+say describe-Version($*VM.version);  # 2025.06-5-gb1c74b8d8
+```
+
+The `describe-Version` subroutine takes a `Version` object and returns a string in the "git describe" format.
+
 expand-tab
 ----------
 

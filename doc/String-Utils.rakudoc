@@ -237,6 +237,16 @@ Returns a C<Bool> indicating whether the string given as the first
 positional argument only consists of characters given as the second
 positional argument, or is empty.
 
+=head2 describe-Version
+
+=begin code :lang<raku>
+say $*VM.version;                    # v2025.06.5.gb.1.c.74.b.8.d.8
+say describe-Version($*VM.version);  # 2025.06-5-gb1c74b8d8
+=end code
+
+The C<describe-Version> subroutine takes a C<Version> object and
+returns a string in the "git describe" format.
+
 =head2 expand-tab
 
 =begin code :lang<raku>

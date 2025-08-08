@@ -10,13 +10,17 @@
   "description": "Provide some optimized string functions",
   "license": "Artistic-2.0",
   "name": "String::Utils",
-  "perl": "6.d",
   "provides": {
     "String::Utils": "lib/String/Utils.rakumod"
   },
+  "raku": "6.d",
   "resources": [
   ],
   "source-url": "https://github.com/lizmat/String-Utils.git",
+  "support": {
+    "bugtracker": "https://github.com/lizmat/String-Utils/issues",
+    "source": "https://github.com/lizmat/String-Utils.git"
+  },
   "tags": [
     "STRING",
     "UTIL",
@@ -30,5 +34,5 @@
   ],
   "test-depends": [
   ],
-  "version": "0.0.35"
+  "version": "0.0.36"
 }

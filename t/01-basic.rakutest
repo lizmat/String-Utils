@@ -1,7 +1,7 @@
 use Test;
 use String::Utils;
 
-plan 117;
+plan 120;
 
 is after("foobar","foo"),       "bar", 'after(foo) ok?';
 is "foobar".&after("foo"),      "bar", '.&after(foo) ok?';
@@ -57,7 +57,10 @@ is-deeply stem("foo.tar.gz"), 'foo', 'stem without number of extensions';
 is-deeply stem("foo.tar.gz", 1), 'foo.tar', 'stem, 1 extension removed';
 is-deeply stem("foo.tar.gz", *), 'foo', 'stem, all extensions removed';
 
-is-deeply ngram("foobar", 3), <foo oob oba bar>,
+is ngram("foobar",3).iterator.count-only, 4, 'does count-only produce ok';
+ngram("foobar",3);  # sink-all test
+my @ngrams is List = ngram("foobar",3);
+is-deeply @ngrams, <foo oob oba bar>,
   'did trigrams work';
 is-deeply ngram("foobar", 4, :partial), <foob ooba obar bar ar r>,
   'did quadgrams work with partial';
@@ -149,6 +152,11 @@ ok String::Utils.^ver,                'can we get a version from the module';
 is String::Utils.^auth, 'zef:lizmat', 'can we get an auth from the module';
 nok String::Utils.^api,               'can we get an api from the module';
 
-is paragraphs($*PROGRAM.lines).elems, 34, 'reading from file lazily';
+is describe-Version(v2025.06.5.gb.1.c.74.b.8.d.8), "2025.06-5-gb1c74b8d8",
+  'was a version with additional commits correctly described';
+is describe-Version(v2025.06), "2025.06",
+  'was a version without additional commits correctly described';
+
+is paragraphs($*PROGRAM.lines).elems, 35, 'reading from file lazily';
 
 # vim: expandtab shiftwidth=4

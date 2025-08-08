@@ -158,6 +158,17 @@ my sub consists-of(str $string, str $chars) {
     nqp::hllbool(nqp::iseq_i($i,$elems))
 }
 
+#- describe-Version ------------------------------------------------------------
+my sub describe-Version(Str() $version) {
+    if after($version,"g") -> $sha {
+        my @major = before($version,"g").split(".", :skip-empty);
+        "@major.head(*-1).join(".")-@major.tail()-g$sha.subst('.',:global)"
+    }
+    else {
+        $version
+    }
+}
+
 #- expand-tab ------------------------------------------------------------------
 my sub expand-tab(str $spec, int $size) {
     my str @parts = nqp::split("\t",$spec);
@@ -666,6 +677,6 @@ my sub EXPORT(*@names) {
 
 #- hack ------------------------------------------------------------------------
 # To allow version / auth / api fetching
-module String::Utils:ver<0.0.35>:auth<zef:lizmat> { }
+module String::Utils:ver<0.0.36>:auth<zef:lizmat> { }
 
 # vim: expandtab shiftwidth=4
