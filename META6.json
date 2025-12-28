@@ -10,6 +10,7 @@
   "description": "Provide some optimized string functions",
   "license": "Artistic-2.0",
   "name": "String::Utils",
+  "production": true,
   "provides": {
     "String::Utils": "lib/String/Utils.rakumod"
   },
@@ -19,6 +20,7 @@
   "source-url": "https://github.com/lizmat/String-Utils.git",
   "support": {
     "bugtracker": "https://github.com/lizmat/String-Utils/issues",
+    "email": "liz@raku.rocks",
     "source": "https://github.com/lizmat/String-Utils.git"
   },
   "tags": [

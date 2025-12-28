@@ -72,6 +72,9 @@ my $string = "foo";
 my $regex  = regexify($string, :ignorecase);
 say "FOOBAR" ~~ $regex;                # ｢FOO｣
 
+say replace("ab42cd", /\d+/, "666");   # ab666cd
+say replace-all("a4b2c", /\d+/, "6");  # a6b6c
+
 say root <abcd abce abde>;             # ab
 
 say sha1("foo bar baz";                # C7567E8B39E...
@@ -436,6 +439,24 @@ my &exactmark = regexify("bår", :smartmark);
 ```
 
 If the needle is a string and does **not** contain any characters with accents, then `ignoremark` semantics will be assumed.
+
+replace
+-------
+
+```raku
+say replace "ab42cd", / \d+ /, "666";  # ab666cd
+```
+
+Return the string with the first match of the specified regex replaced by the replacement string. Does **not** set `$/`, and can thus be up to 8x as fast as the equivalent `.subst` call.
+
+replace-all
+-----------
+
+```raku
+say replace-all "ab42cd88ef", / \d+ /, "666";  # ab666cd666ef
+```
+
+Return the string with the **all** matches of the specified regex replaced by the replacement string. Does **not** set `$/`, and can thus be up to 5x as fast as the equivalent `.subst` call.
 
 root
 ----

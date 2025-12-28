@@ -558,6 +558,50 @@ my sub regexify(str $spec, *%_) {
     "/$i$m$spec/".EVAL  # until there's a better solution
 }
 
+#- replace ---------------------------------------------------------------------
+my constant $cursor-init = Match.^lookup("!cursor_init");
+my sub replace(str $haystack, Regex:D $needle, str $replacement) {
+    my $cursor := $needle($cursor-init(Match,$haystack,:0c));
+    my int $pos = nqp::getattr_i($cursor,Match,'$!pos');
+    $pos >= 0
+      ?? nqp::substr($haystack,0,nqp::getattr_i($cursor,Match,'$!from'))
+           ~ $replacement
+           ~ nqp::substr($haystack,$pos)
+      !! $haystack
+}
+
+#- replace-all -----------------------------------------------------------------
+my constant $global = Match.^lookup("CURSOR_MORE");
+my sub replace-all(str $haystack, Regex:D $needle, str $replacement) {
+    my $cursor := $needle($cursor-init(Match,$haystack,:0c));
+    my int $pos = nqp::getattr_i($cursor,Match,'$!pos');
+    if $pos >= 0 {
+        my int $start;
+        my str @parts;
+        nqp::while(
+          $pos >= 0,
+          nqp::stmts(
+            nqp::push_s(@parts,
+              nqp::substr(
+                $haystack,
+                $start,
+                nqp::getattr_i($cursor,Match,'$!from') - $start
+              )
+            ),
+            nqp::push_s(@parts,$replacement),
+            $start = $pos,
+            ($cursor := $global($cursor)),
+            ($pos = nqp::getattr_i($cursor,Match,'$!pos'))
+          )
+        );
+        nqp::push_s(@parts,nqp::substr($haystack,$start));
+        nqp::join("",@parts)
+    }
+    else {
+        $haystack
+    }
+}
+
 #- root ------------------------------------------------------------------------
 my sub root(*@s) {
     if @s > 1 {

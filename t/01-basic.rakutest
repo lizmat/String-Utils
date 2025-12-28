@@ -1,7 +1,7 @@
 use Test;
 use String::Utils;
 
-plan 120;
+plan 122;
 
 is after("foobar","foo"),       "bar", 'after(foo) ok?';
 is "foobar".&after("foo"),      "bar", '.&after(foo) ok?';
@@ -157,6 +157,25 @@ is describe-Version(v2025.06.5.gb.1.c.74.b.8.d.8), "2025.06-5-gb1c74b8d8",
 is describe-Version(v2025.06), "2025.06",
   'was a version without additional commits correctly described';
 
-is paragraphs($*PROGRAM.lines).elems, 35, 'reading from file lazily';
+subtest "check all replace cases" => {
+    for "42", "666", "ab42", "ab666", "ab42cd", "ab666cd", "42cd", "666cd",
+        "ab42cd88", "ab666cd88", "abcd", "abcd", "", ""
+    -> str $before, str $after {
+        is replace($before, / \d+ /, "666"), $after,
+          "'$before' -> '$after'";
+    }
+}
+
+subtest "check all replace-all cases" => {
+    for "42", "666", "ab42", "ab666", "ab42cd", "ab666cd", "42cd", "666cd",
+        "ab42cd88", "ab666cd666", "ab42cd88ef", "ab666cd666ef",
+        "abcd", "abcd", "", ""
+    -> str $before, str $after {
+        is replace-all($before, / \d+ /, "666"), $after,
+          "'$before' -> '$after'";
+    }
+}
+
+is paragraphs($*PROGRAM.lines).elems, 37, 'reading from file lazily';
 
 # vim: expandtab shiftwidth=4
