@@ -1,6 +1,8 @@
 Revision history for String-Utils
 
 {{$NEXT}}
+
+0.0.37  2025-12-28T13:41:22+01:00
     - Added support for "replace" and "replace-all"
     - Modernize META info
 

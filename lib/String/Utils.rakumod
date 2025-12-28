@@ -721,6 +721,6 @@ my sub EXPORT(*@names) {
 
 #- hack ------------------------------------------------------------------------
 # To allow version / auth / api fetching
-module String::Utils:ver<0.0.36>:auth<zef:lizmat> { }
+module String::Utils:ver<0.0.37>:auth<zef:lizmat> { }
 
 # vim: expandtab shiftwidth=4
