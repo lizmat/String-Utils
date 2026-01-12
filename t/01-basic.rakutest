@@ -1,7 +1,7 @@
 use Test;
 use String::Utils;
 
-plan 122;
+plan 123;
 
 is after("foobar","foo"),       "bar", 'after(foo) ok?';
 is "foobar".&after("foo"),      "bar", '.&after(foo) ok?';
@@ -176,6 +176,25 @@ subtest "check all replace-all cases" => {
     }
 }
 
-is paragraphs($*PROGRAM.lines).elems, 37, 'reading from file lazily';
+subtest "check shortening" => {
+    for <f…z f…az fo…az fo…baz foo…baz foo…rbaz foobarbaz> {
+        is shorten("foobarbaz", .chars), $_, "shorten to '$_' ok";
+    }
+    is shorten("foobarbaz",10), "foobarbaz", 'no shortening on 10';
+    fails-like { shorten("foobarbaz",2) }, X::AdHoc,
+      :payload("Target length 2 is too short"),
+      'fails for < 3';
+    fails-like { shorten("fo",1) }, X::AdHoc,
+      :payload("Target length 1 is too short"),
+      'fails for < 2';
+    fails-like { shorten("f",0) }, X::AdHoc,
+      :payload("Target length 0 is too short"),
+      'fails for < 1';
+    for "", "f", "fo" {
+        is shorten($_, .chars), $_, "shorten of short '$_' ok";
+    }
+}
+
+is paragraphs($*PROGRAM.lines).elems, 38, 'reading from file lazily';
 
 # vim: expandtab shiftwidth=4

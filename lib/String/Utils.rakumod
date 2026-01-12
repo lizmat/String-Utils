@@ -637,6 +637,33 @@ my sub root(*@s) {
 #- sha1 ------------------------------------------------------------------------
 my sub sha1(str $needle) { nqp::sha1($needle) }  # UNCOVERABLE
 
+#- shorten ---------------------------------------------------------------------
+my sub shorten(str $target, int $max) {
+    nqp::if(
+      nqp::chars($target) <= $max,
+      $target,
+      nqp::if(
+        $max >= 3,
+        nqp::concat(
+          nqp::substr(
+            $target,
+            0,
+            (my int $half = nqp::bitshiftr_i($max,1))
+              - nqp::not_i(nqp::bitand_i($max,1))  # UNCOVERABLE
+          ),
+          nqp::concat(
+            '…',
+            nqp::substr(
+              $target,
+              nqp::chars($target) - $half
+            )
+          )
+        ),
+        "Target length $max is too short".Failure
+      )
+    )
+}
+
 #- stem ------------------------------------------------------------------------
 my sub stem(str $basename, $parts = *) {
     (my @indices := indices($basename, '.'))

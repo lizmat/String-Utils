@@ -79,6 +79,8 @@ say root <abcd abce abde>;             # ab
 
 say sha1("foo bar baz";                # C7567E8B39E...
 
+say shorten("foobarbaz", 7);           # foo…baz
+
 say stem "foo.tar.gz";                 # foo
 say stem "foo.tar.gz", 1;              # foo.tar
 
@@ -476,6 +478,21 @@ say sha1("foo bar baz";  # C7567E8B39E2428E38BF9C9226AC68DE4C67DC39
 
 Returns a [`SHA1`](https://en.wikipedia.org/wiki/SHA-1) of the given string. It should only be used for simple identification uses, as it can no longer reliably serve in any cryptographic use.
 
+shorten
+-------
+
+```raku
+say shorten("foobarbaz", 3);           # f…z
+say shorten("foobarbaz", 4);           # f…az
+say shorten("foobarbaz", 7);           # foo…baz
+say shorten("foobarbaz",10);           # foobarbaz
+say shorten("f",1),                    # f
+```
+
+Returns a shortened version of a given string, shortened to the maximum number of chars given. If this maximum is less than the number of chars in the string, than some characters from the start and from the end will be shown connected by the "…" character.
+
+Specifying a maximum of less then 3 will result in a `Failure` if the given string was more than 3 characters long.
+
 stem
 ----
 
@@ -532,7 +549,7 @@ If you like this module, or what I’m doing more generally, committing to a [sm
 COPYRIGHT AND LICENSE
 =====================
 
-Copyright 2022, 2023, 2024, 2025 Elizabeth Mattijsen
+Copyright 2022, 2023, 2024, 2025, 2026 Elizabeth Mattijsen
 
 This library is free software; you can redistribute it and/or modify it under the Artistic License 2.0.
 
