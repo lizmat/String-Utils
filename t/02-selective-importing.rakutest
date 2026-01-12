@@ -2,10 +2,10 @@ use Test;
 
 my constant @subs = <
   abbrev after all-same around before between between-included
-  chomp-needle consists-of expand-tab has-marks is-lowercase is-sha1
-  is-uppercase is-whitespace leading-whitespace leaf letters ngram
-  non-word regexify root sha1 stem text-from-url trailing-whitespace
-  word-at
+  chomp-needle consists-of describe-Version expand-tab has-marks
+  is-lowercase is-sha1 is-uppercase is-whitespace leading-whitespace
+  leaf letters ngram non-word regexify replace replace-all root sha1
+  shorten stem text-from-url trailing-whitespace word-at
 >;
 
 plan @subs + 2;

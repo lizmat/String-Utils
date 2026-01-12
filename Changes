@@ -1,6 +1,8 @@
 Revision history for String-Utils
 
 {{$NEXT}}
+
+0.0.38  2026-01-12T21:57:52+01:00
     - Added support for "shorten"
     - Updated copyright year
 
