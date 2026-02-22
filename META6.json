@@ -32,7 +32,8 @@
     "NGRAM",
     "NAUGHTY",
     "WORD",
-    "MARKS"
+    "MARKS",
+    "ANAGRAM"
   ],
   "test-depends": [
   ],

@@ -90,6 +90,8 @@ dd trailing-whitespace("bar \t ");     # " \t "
 
 say word-at("foo bar baz", 5);         # (4 3 1)
 
+say word-diff("maiden");               # (daimen damine maiden median)
+
 use String::Utils <before after>;  # only import "before" and "after"
 ```
 
@@ -536,6 +538,33 @@ say word-at("foo bar baz", 5);  # (4 3 1)
 Returns a `List` with the start position, the number of characters of the word, and the ordinal number of the word found in the given string at the given position, or directly before it (using `.words` semantics).
 
 Returns `Empty` if no word could be found at the given position, or the position was out of range.
+
+word-diff
+---------
+
+```raku
+# from /usr/share/dict/words
+say word-diff("maiden");  # (daimen damine maiden median)
+
+my @words = <ace ach act add aft zip>;
+say word-diff("cat", :@words);             # (act)
+say word-diff("cat", :@words, :1letters);  # (ace ach aft)
+say word-diff("cat", :@words, :2letters);  # (add)
+say word-diff("cat", :@words, :3letters);  # (zip)
+say word-diff("cat", :@words, :4letters);  # ()
+```
+
+Returns a (lazy) `List` of words that differ from a given word by a number of letters, but with the same number of characters.
+
+Apart from the word (passed as the only positional argument) it also takes these named arguments:
+
+### :letters
+
+The number of letters that should be different. Defaults to **0**, making it essentially look for anagrams. In that case, the original word *may* occur in the result list as well.
+
+### :words
+
+The word list that should be used to search in. Defaults to the word list found in "/usr/share/dict/words". If specified, should be a list or an `IO` object. In the latter case it will be assumed to be a file that contains a single word on each line.
 
 AUTHOR
 ======

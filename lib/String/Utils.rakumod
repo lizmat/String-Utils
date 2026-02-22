@@ -731,18 +731,24 @@ my sub word-at(str $string, int $cursor) {
 
 my sub word-diff(
   str  $needle,
-  int :$letters = 1,
+  int :$letters,
       :$words  = "/usr/share/dict/words".IO.lines
 ) {
     my int $chars = nqp::chars($needle);
-    my int $dist  = $letters + $letters;
-    my Bag $this := $needle.comb.Bag;
+    if $letters > $chars {
+        ()
+    }
+    else {
+        my int $dist  = $letters + $letters;
+        my Bag $this := $needle.comb.Bag;
 
-    $words.map: -> str $word {
-        if nqp::chars($word) == $chars {
-            my $that := $word.comb.Bag;
-            my $diff := $this (^) $that;
-            $word if $diff.elems == $dist && $diff.values.sum == $dist;
+        (nqp::istype($words,IO::Path)
+          ?? $words.lines
+          !! $words
+        ).map: -> str $word {
+            $word
+              if nqp::chars($word) == $chars
+              && ($this (^) $word.comb.Bag).values.sum == $dist;
         }
     }
 }

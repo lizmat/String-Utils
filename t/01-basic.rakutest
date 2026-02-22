@@ -196,11 +196,37 @@ subtest "check shortening" => {
 }
 
 subtest "check word differences" => {
+    if "/usr/share/dict/words".IO.e {
+        is-deeply
+          word-diff("maiden"),
+          <daimen damine maiden median>,
+          'is the default for letters and words ok';
+        is-deeply
+          word-diff("maiden", :words("/usr/share/dict/words".IO)),
+          <daimen damine maiden median>,
+          'is the default for letters and words ok';
+    }
+    my @words = <ace ach act aft zip zop tac zap soc ait alt amt ant>;
     is-deeply
-      word-diff("kettle"),
-      <alette fettle kelter ketole keylet kittel kittle letten letter
-       mettle nettle pettle settle>,
-      'is the default for letters and words ok';
+      word-diff("cat", :0letters, :@words),
+      <act tac>,
+      "anagrams of cat";
+    is-deeply
+      word-diff("cat", :1letters, :@words),
+      <ace ach aft ait alt amt ant>,
+      "one letter difference of cat";
+    is-deeply
+      word-diff("cat", :2letters, :@words),
+      <zap soc>,
+      "two letter difference of cat";
+    is-deeply
+      word-diff("cat", :3letters, :@words),
+      <zip zop>,
+      "three letter difference of cat";
+    is-deeply
+      word-diff("cat", :4letters, :@words),
+      (),
+      "four letter difference of cat";
 }
 
 is paragraphs($*PROGRAM.lines).elems, 39, 'reading from file lazily';
