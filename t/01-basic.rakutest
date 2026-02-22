@@ -1,7 +1,7 @@
 use Test;
 use String::Utils;
 
-plan 123;
+plan 124;
 
 is after("foobar","foo"),       "bar", 'after(foo) ok?';
 is "foobar".&after("foo"),      "bar", '.&after(foo) ok?';
@@ -195,6 +195,14 @@ subtest "check shortening" => {
     }
 }
 
-is paragraphs($*PROGRAM.lines).elems, 38, 'reading from file lazily';
+subtest "check word differences" => {
+    is-deeply
+      word-diff("kettle"),
+      <alette fettle kelter ketole keylet kittel kittle letten letter
+       mettle nettle pettle settle>,
+      'is the default for letters and words ok';
+}
+
+is paragraphs($*PROGRAM.lines).elems, 39, 'reading from file lazily';
 
 # vim: expandtab shiftwidth=4

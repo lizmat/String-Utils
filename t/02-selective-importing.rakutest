@@ -5,7 +5,7 @@ my constant @subs = <
   chomp-needle consists-of describe-Version expand-tab has-marks
   is-lowercase is-sha1 is-uppercase is-whitespace leading-whitespace
   leaf letters ngram non-word regexify replace replace-all root sha1
-  shorten stem text-from-url trailing-whitespace word-at
+  shorten stem text-from-url trailing-whitespace word-at word-diff
 >;
 
 plan @subs + 2;
