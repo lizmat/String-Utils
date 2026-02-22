@@ -4,7 +4,7 @@
   "specVersion": "1.6",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-01-12T20:58:21+00:00",
+    "timestamp": "2026-02-22T19:36:20+00:00",
     "lifecycles": [
       {
         "phase": "pre-build"
@@ -19,7 +19,7 @@
     "component": {
       "type": "library",
       "mime-type": "text/plain",
-      "bom-ref": "pkg:raku/zef:lizmat/String::Utils@0.0.38",
+      "bom-ref": "pkg:raku/zef:lizmat/String::Utils@0.0.39",
       "authors": [
         {
           "bom-ref": "ElizabethMattijsen",
@@ -29,7 +29,7 @@
       "publisher": "zef",
       "group": "zef:lizmat",
       "name": "String::Utils",
-      "version": "0.0.38",
+      "version": "0.0.39",
       "description": "Provide some optimized string functions",
       "scope": "required",
       "licenses": [
@@ -41,14 +41,14 @@
           }
         }
       ],
-      "purl": "pkg:raku/zef:lizmat/String::Utils@0.0.38",
+      "purl": "pkg:raku/zef:lizmat/String::Utils@0.0.39",
       "externalReferences": [
         {
           "url": "https://github.com/lizmat/String-Utils",
           "type": "distribution"
         },
         {
-          "url": "https://raku.land/zef:lizmat/String::Utils?v=0.0.38",
+          "url": "https://raku.land/zef:lizmat/String::Utils?v=0.0.39",
           "type": "documentation"
         },
         {
@@ -60,7 +60,7 @@
           "type": "license"
         },
         {
-          "url": "https://github.com/lizmat/String-Utils/archive/refs/tags/0.0.38.zip",
+          "url": "https://github.com/lizmat/String-Utils/archive/refs/tags/0.0.39.zip",
           "type": "source-distribution"
         },
         {
@@ -77,7 +77,8 @@
         "NGRAM",
         "NAUGHTY",
         "WORD",
-        "MARKS"
+        "MARKS",
+        "ANAGRAM"
       ]
     },
     "licenses": [
@@ -165,7 +166,7 @@
       "publisher": "Rakudo Core Developers",
       "group": "Rakudo Core Developers",
       "name": "Rakudo",
-      "version": "2025.12-14-g6f087b06d",
+      "version": "2026.01-20-g4fb9c0dcb",
       "description": "The Rakudo™ Compiler implementing the Raku® Programming Language",
       "scope": "required",
       "licenses": [
@@ -188,7 +189,7 @@
           "type": "issue-tracker"
         },
         {
-          "url": "https://github.com/rakudo/rakudo/archive/6f087b06d.zip",
+          "url": "https://github.com/rakudo/rakudo/archive/4fb9c0dcb.zip",
           "type": "source-distribution"
         },
         {
@@ -209,7 +210,7 @@
       "publisher": "The MoarVM Team",
       "group": "The MoarVM Team",
       "name": "Moar",
-      "version": "2025.12-5-g5eb2ccf33",
+      "version": "2026.01-6-g42cb3592b",
       "description": "Short for \"Metamodel On A Runtime\", MoarVM is a modern virtual machine built for the Rakudo compiler and the NQP Compiler Toolchain.",
       "scope": "required",
       "licenses": [
@@ -236,7 +237,7 @@
           "type": "chat"
         },
         {
-          "url": "https://github.com/MoarVM/MoarVM.git/archive/refs/tags/5eb2ccf33.zip",
+          "url": "https://github.com/MoarVM/MoarVM.git/archive/refs/tags/42cb3592b.zip",
           "type": "source-distribution"
         }
       ]
@@ -248,7 +249,7 @@
       "type": "distribution"
     },
     {
-      "url": "https://raku.land/zef:lizmat/String::Utils?v=0.0.38",
+      "url": "https://raku.land/zef:lizmat/String::Utils?v=0.0.39",
       "type": "documentation"
     },
     {
@@ -260,7 +261,7 @@
       "type": "license"
     },
     {
-      "url": "https://github.com/lizmat/String-Utils/archive/refs/tags/0.0.38.zip",
+      "url": "https://github.com/lizmat/String-Utils/archive/refs/tags/0.0.39.zip",
       "type": "source-distribution"
     },
     {

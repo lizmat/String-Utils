@@ -746,7 +746,7 @@ my sub word-diff(
           ?? $words.lines
           !! $words
         ).map: -> str $word {
-            $word
+            $word  # UNCOVERABLE
               if nqp::chars($word) == $chars
               && ($this (^) $word.comb.Bag).values.sum == $dist;
         }
@@ -774,6 +774,6 @@ my sub EXPORT(*@names) {
 
 #- hack ------------------------------------------------------------------------
 # To allow version / auth / api fetching
-module String::Utils:ver<0.0.38>:auth<zef:lizmat> { }
+module String::Utils:ver<0.0.39>:auth<zef:lizmat> { }
 
 # vim: expandtab shiftwidth=4
