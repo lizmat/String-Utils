@@ -197,14 +197,10 @@ subtest "check shortening" => {
 
 subtest "check word differences" => {
     if "/usr/share/dict/words".IO.e {
-        is-deeply
-          word-diff("maiden"),
-          <daimen damine maiden median>,
+        ok "maiden" ∈ word-diff("maiden"),
           'is the default for letters and words ok';
-        is-deeply
-          word-diff("maiden", :words("/usr/share/dict/words".IO)),
-          <daimen damine maiden median>,
-          'is the default for letters and words ok';
+        ok "maiden" ∈ word-diff("maiden", :words("/usr/share/dict/words".IO)),
+          'can it take an IO';
     }
     my @words = <ace ach act aft zip zop tac zap soc ait alt amt ant>;
     is-deeply

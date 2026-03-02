@@ -2,6 +2,9 @@ Revision history for String-Utils
 
 {{$NEXT}}
 
+0.0.40  2026-03-02T11:23:04+01:00
+    - Fix word-diff test that breaks for some word lists
+
 0.0.39  2026-02-22T20:35:51+01:00
     - Added support for "word-diff"
 
